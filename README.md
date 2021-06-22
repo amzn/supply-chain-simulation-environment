@@ -1,17 +1,28 @@
-## My Project
+# miniSCOT
 
-TODO: Fill this README out!
+miniSCOT is a simulation tool that lets users play with the supply chain
+architecture and algorithms at any level of fidelity. The system allows users to
+‘snap together’ their own customer supply chain out of pre-built modules, and
+the open-source Python codebase allows easy development of new components and
+baselines.
 
-Be sure to:
+## Documentation
 
-* Change the title in this README
-* Edit your repository description on GitHub
+Generated documentation for the latest released version can be accessed here:
+TODO for opensource
 
-## Security
+### Plain-old-python-setup.py
 
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+* Clone the git repository (e.g. `git clone TODO FOR OPENSOURCE)
 
-## License
+* Build a source distribution:
+- `python setup.py sdist`
 
-This project is licensed under the Apache-2.0 License.
+* Install:
+- `python setup.py install`
 
+* Switch to develop mode (recommended):
+- `python setup.py develop`
+
+* Start the command-line application:
+- `miniscot`

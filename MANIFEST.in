@@ -1,0 +1,3 @@
+include src/scse/datasets/*.csv
+include src/scse/datasets/*.csv.gz
+include src/scse/profiles/*.json
