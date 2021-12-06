@@ -10,7 +10,6 @@ from scse.api.network import get_asin_inventory_in_network
 from scse.api.network import get_asin_inventory_on_all_inbound_arcs
 import numpy as np
 from scipy.stats import poisson
-from scse.services.service_registry import singleton as registry
 
 import logging
 logger = logging.getLogger(__name__)
@@ -18,20 +17,18 @@ logger = logging.getLogger(__name__)
 
 class ServiceLevelBuying(Agent):
     def __init__(self, run_parameters):
-        simulation_seed = run_parameters['simulation_seed']
-        self._rng = np.random.RandomState(simulation_seed)
+        self._simulation_seed = run_parameters['simulation_seed']
+        self.buying_rng = np.random.default_rng(self._simulation_seed)
         # TODO hardcoding default service level to 0.9 (i.e. buy to P90 of demand forecast)
         _DEFAULT_SERVICE_LEVEL = 0.9
         # TODO hardcoding to planning horizon of 1 (i.e. buy for 1 day of forecasted demand)
-        _DEFAULT_PLANNING_HORIZON = 1
+        _DEFAULT_PLANNING_HORIZON = 7
         # TODO hardcoding poisson max_mean to 10, to match poisson customer order
         # A more robust way of doing this is to create a poisson service that both modules call
-        _DEFAULT_MAX_MEAN = 10
+        _DEFAULT_MAX_MEAN = 100
         self._service_level = _DEFAULT_SERVICE_LEVEL
         self._planning_horizon = _DEFAULT_PLANNING_HORIZON
         self._max_mean = _DEFAULT_MAX_MEAN
-
-        self._holding_cost_service = registry.load_service('holding_cost_service', run_parameters)
 
     def get_name(self):
         return 'buying'
@@ -48,8 +45,6 @@ class ServiceLevelBuying(Agent):
         G = state['network']
 
         for asin in self._asin_list:
-            asin_holding_cost = self._holding_cost_service.get_holding_cost(asin)
-            #logger.debug("Holding cost is {}".format(asin_holding_cost))
             # calculate tip for planning period of 7 days (i.e. buy enough to cover 7 days of demand)
             target_inventory_position = self._calculate_tip(asin, current_time, self._planning_horizon)
             logger.debug(
@@ -90,7 +85,7 @@ class ServiceLevelBuying(Agent):
         self._p90_demand[asin] = 0
 
         for i in range(0,planning_period):
-            mean_demand = self._rng.rand() * self._max_mean
+            mean_demand = self.buying_rng.random() * self._max_mean
             self._p90_demand[asin] += poisson.ppf(self._service_level, mean_demand)
 
         tip = self._p90_demand[asin]

@@ -1,0 +1,14 @@
+{
+  "name": "ports_demo_profile",
+  "description": "Environment for miniscot newsvendor demo",
+  "modules": [
+    "scse.modules.selection.demo_newsvendor_selection.SimpleSelectionAgent",
+    "scse.modules.topology.demo_ports_network.SimpleNetwork",
+    "scse.modules.customer.demo_ports_poisson_customer_order.PoissonCustomerOrder",
+    "scse.modules.fulfillment.demo_newsvendor_closest_warehouse_fulfillment.ClosestWarehouseFulfillment",
+    "scse.modules.buying.demo_ports_service_level_buying_policy.ServiceLevelBuying",
+    "scse.modules.vendor.demo_ports_infinite_inventory.InfiniteInventoryVendor",
+    "scse.modules.placement.demo_ports_placement_heuristic_capacity.PlacementHeuristic"
+  ],
+  "metrics": ["scse.metrics.demo_newsvendor_cash_accounting.CashAccounting"]
+}
