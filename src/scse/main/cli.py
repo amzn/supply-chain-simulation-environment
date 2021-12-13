@@ -16,7 +16,8 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
 
     def __init__(self, **args):
         super().__init__(args)
-        self.intro = self.colorize("Welcome to miniSCOT - your Supply Chain in a bottle.", 'cyan')
+        print("Welcome to miniSCOT - your Supply Chain in a bottle.")
+        # self.intro = self.colorize("Welcome to miniSCOT - your Supply Chain in a bottle.", 'cyan')
 
         self._start(simulation_seed = self._DEFAULT_SIMULATION_SEED,
                     start_date = self._DEFAULT_START_DATE,
@@ -28,7 +29,8 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
         self._set_prompt()
 
     def _set_prompt(self):
-        self.prompt = self.colorize("miniSCOT (t = {!r}) $ ".format(self._state['clock']), 'cyan')
+        print("miniSCOT (t = {!r}) $ ".format(self._state['clock']))
+        # self.prompt = self.colorize("miniSCOT (t = {!r}) $ ".format(self._state['clock']), 'cyan')
 
     def postcmd(self, stop, line):
         self._set_prompt()
