@@ -6,3 +6,4 @@ alias create pohist print po_hist
 alias create inbounds print inbound_shipments
 alias create outbounds print outbound_shipments
 alias create transfers print transfer_shipments
+alias create debug set debug true

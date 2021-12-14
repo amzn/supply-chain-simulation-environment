@@ -11,11 +11,11 @@ from scse.controller import miniscot as miniSCOT
 
 class MiniSCOTDebuggerApp(cmd2.Cmd):
     _DEFAULT_START_DATE = '2019-01-01'
-    _DEFAULT_TIME_INCREMENT = 'daily'
+    _DEFAULT_TIME_INCREMENT = 'half-hourly'
     _DEFAULT_HORIZON = 100
     _DEFAULT_SIMULATION_SEED = 12345
-    _DEFAULT_ASIN_SELECTION = 1 # or use an integer value to select the number of asins
-    _DEFAULT_PROFILE = 'newsvendor_demo_profile'
+    _DEFAULT_ASIN_SELECTION = 0 # or use an integer value to select the number of asins
+    _DEFAULT_PROFILE = 'national_grid_profile'
 
     def __init__(self, **args):
         super().__init__(args)

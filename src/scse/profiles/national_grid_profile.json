@@ -1,0 +1,12 @@
+{
+  "name": "national_grid_profile",
+  "description": "Environment for simulation of the UK National Grid",
+  "modules": [
+    "scse.modules.selection.national_grid_selection.SourcesSelectionAgent",
+    "scse.modules.topology.national_grid_network.NationalGridNetwork",
+    "scse.modules.customer.national_grid_constant_demand.ConstantDemand",
+    "scse.modules.fulfillment.national_grid_closest_substation_fulfillment.ClosestSubstationFulfillment",
+    "scse.modules.vendor.national_grid_constant_supply.ConstantSupply"
+  ],
+  "metrics": ["scse.metrics.demo_newsvendor_cash_accounting.CashAccounting"]
+}
