@@ -13,6 +13,7 @@ class CashAccounting():
         # Hardcoding vendor cost, customer price, holding cost, and lost demand penalty
         self._cost = 5
         self._price = 10
+        self._transfer_cost = 2
         self._holding_cost = 0.5
         self._lost_demand_penalty = 0
 
@@ -23,15 +24,18 @@ class CashAccounting():
         self._timestep_revenue = 0
         self._timestep_vendor_cost = 0
         self._timestep_holding_cost = 0
+        self._timestep_transfer_cost = 0
         self._timestep_sales_quantity = 0
+        
         # We'll use this to track unfilled demand, since this builds up
         self._cumulative_customer_orders = []
         # We'll print a csv log, with structure:
         self._log_header = [
             "timestep", 
             "revenue", 
-            "vendor_cost", 
-            "holding_cost", 
+            "vendor_cost",
+            "transfer_cost",  
+            "holding_cost",
             "customer_demand_quantity", 
             "sales_quantity",
             "unfilled_demand"
@@ -60,6 +64,14 @@ class CashAccounting():
 
             # add to timestep aggregate metrics, to be logged later
             self._timestep_vendor_cost += cost
+
+            reward = -1 * cost
+
+        elif actionType == 'transfer':
+
+            cost = self._transfer_cost* quantity
+
+            self._timestep_transfer_cost += cost
 
             reward = -1 * cost
 
@@ -97,7 +109,8 @@ class CashAccounting():
 
             timestep_log = [
                 str(state['clock']), self._timestep_revenue,
-                self._timestep_vendor_cost, self._timestep_holding_cost,
+                self._timestep_vendor_cost, self._timestep_transfer_cost,
+                self._timestep_holding_cost,
                 self._timestep_sales_quantity + timestep_unfilled_demand,
                 self._timestep_sales_quantity, timestep_unfilled_demand
             ]
@@ -105,8 +118,10 @@ class CashAccounting():
 
             self._timestep_revenue = 0
             self._timestep_vendor_cost = 0
+            self._timestep_transfer_cost = 0
             self._timestep_holding_cost = 0
             self._timestep_sales_quantity = 0
+            
 
             # If we're at the end of the episode, print the csv log
             if state['clock'] == (self._time_horizon - 1):
