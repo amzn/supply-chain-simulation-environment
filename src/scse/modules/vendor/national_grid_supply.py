@@ -9,7 +9,7 @@ class ElectricitySupply(Agent):
 
     def __init__(self, run_parameters):
         """
-        Simulates electricity supply.
+        Simulates electricity supply from all sources.
 
         Supply forecast is provided by a service.
         """
