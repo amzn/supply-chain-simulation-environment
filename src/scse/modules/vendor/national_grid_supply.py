@@ -1,17 +1,19 @@
 from scse.api.module import Agent
+from scse.services.service_registry import singleton as registry
 
 import logging
 logger = logging.getLogger(__name__)
 
 
-class ConstantSupply(Agent):
-    _DEFAULT_AMOUNT = 10
+class ElectricitySupply(Agent):
 
     def __init__(self, run_parameters):
         """
-        Simulates time invariant electricity supply from all sources.
+        Simulates electricity supply.
+
+        Supply forecast is provided by a service.
         """
-        self._amount = self._DEFAULT_AMOUNT
+        self._supply_forecast_service = registry.load_service('electricity_supply_forecast_service', run_parameters)
 
     def get_name(self):
         return 'vendor'
@@ -53,14 +55,16 @@ class ConstantSupply(Agent):
                     raise ValueError('All sources must have only one generation type - multiple not yet supported.')
                 
                 generation_type = generation_types[0]
-                logger.debug(f"Supply for {self._amount} quantity of ASIN {generation_type}.")
+                forecasted_supply = self._supply_forecast_service.get_forecast(generation_type, current_time)
+                
+                logger.debug(f"Supply for {forecasted_supply} quantity of ASIN {generation_type}.")
 
                 action = {
                     'type': 'inbound_shipment',
                     'asin': generation_type,
                     'origin': node,
                     'destination': substation,
-                    'quantity': self._amount,
+                    'quantity': forecasted_supply,
                     'schedule': current_clock
                 }
 

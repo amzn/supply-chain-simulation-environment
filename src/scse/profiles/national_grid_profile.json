@@ -4,9 +4,9 @@
   "modules": [
     "scse.modules.selection.national_grid_selection.SourcesSelectionAgent",
     "scse.modules.topology.national_grid_network.NationalGridNetwork",
-    "scse.modules.customer.national_grid_constant_demand.ConstantDemand",
+    "scse.modules.customer.national_grid_demand.ElectricityDemand",
     "scse.modules.fulfillment.national_grid_closest_substation_fulfillment.ClosestSubstationFulfillment",
-    "scse.modules.vendor.national_grid_constant_supply.ConstantSupply"
+    "scse.modules.vendor.national_grid_supply.ElectricitySupply"
   ],
   "metrics": ["scse.metrics.demo_newsvendor_cash_accounting.CashAccounting"]
 }
