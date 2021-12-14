@@ -6,6 +6,8 @@ import logging
 import networkx as nx
 import datetime
 import time
+from collections import defaultdict
+
 from scse.api.module import Agent
 from scse.api.module import Env
 from scse.utils.printer import red
@@ -84,6 +86,13 @@ class SupplyChainEnvironment:
         # TODO Should we treat this as context or state?
         state['customer_orders'] = []
         state['purchase_orders'] = []
+
+        # Keep a history of order, shipments and history
+        state['customer_order_history'] = defaultdict(list)
+        state['purchase_order_history'] = defaultdict(list)
+        state['inbound_shipment_history'] = defaultdict(list)
+        state['outbound_shipment_history'] = defaultdict(list)
+        state['transfer_history'] = defaultdict(list)
 
         # The final Env is made of contributions from Env-modules. Each
         # Env-module can provide (static) context and the initial values for
@@ -258,6 +267,8 @@ class SupplyChainEnvironment:
         state, action = self._remove_order_entity(state, action)      
         # either way, append new order to state
         state[atype_to_state].append(action)
+        # keep a history of all orders made
+        state[f'{action["type"]}_history'][state['clock']].append(action)
 
         return state
 
@@ -307,6 +318,9 @@ class SupplyChainEnvironment:
 
 
         shipments.append(shipment)
+
+        # keep a history of all shipments made
+        state[f'{atype}_history'][state['clock']].append(shipment)
 
         return state
 

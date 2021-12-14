@@ -46,6 +46,10 @@ class InfiniteInventoryVendor(Agent):
             ## Complete action_form with the origin node, confirm the quantity we can fulfill,
             ## and schedule when it ships (e.g. 2 timesteps from now)
 
+            logger.debug("Fulfilling PO for {} quantity of ASIN {} to warehouse {}.".format(
+                po['quantity'], po['asin'], closest_warehouse_name)
+                )
+
             action = {
                 'type': 'inbound_shipment',
                 'asin': po['asin'],
