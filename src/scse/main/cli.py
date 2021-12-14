@@ -1,5 +1,6 @@
 from __future__ import print_function
 import sys
+import importlib
 import argparse
 import cmd2
 import pprint
@@ -106,7 +107,8 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
         elif args == "reward":
             msg = pprint.pformat(self._reward)
         else:
-            msg = """Valid options are: nodes | edges | actions | orders | POs | reward"""
+            msg = "Valid options are: nodes | edges | actions | orders | order_hist | POs | po_hist | " + \
+                "inbound_shipments | outbound_shipments | transfer_shipments | reward"
 
         self.poutput(msg)
 
@@ -116,9 +118,22 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
         # Make sure any pre-existing figures are closed
         plt.close()
 
-        # Get the graph object and node positions
+        # If cartopy is available then use it
+        if importlib.util.find_spec("cartopy"):
+            import cartopy.crs as ccrs
+            fig, ax = plt.subplots(1, 1, figsize=(10,10), subplot_kw=dict(projection=ccrs.PlateCarree()))
+
+            # Add coastlines
+            ax.coastlines()
+
+            # Limit axes to the UK
+            ax.set_extent([-8., 2., 49., 60.])
+        else:
+            fig, ax = plt.subplots(1, 1, figsize=(10,10))
+
+        # Get the graph object and coordinates of each node in the network
         G = self._state['network']
-        pos = nx.spring_layout(G)
+        pos = {node_name: node_data['location'] for node_name, node_data in G.nodes(data=True)}
 
         # Create a dictionary of nodes by type, and of total holdings at each node
         node_type_dict = defaultdict(list)
@@ -132,15 +147,15 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
         # Plot the nodes, with a different colour for each type
         color_cycle = cycle(['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd'])
         for node_type, node_names in node_type_dict.items():
-            nx.draw_networkx_nodes(G, pos, nodelist=node_names, node_color=next(color_cycle), label=node_type)
+            nx.draw_networkx_nodes(G, pos=pos, ax=ax, nodelist=node_names, node_color=next(color_cycle), label=node_type)
 
         # Add two sets of node labels - name and quantity of product held
-        shifted_pos = {k:[v[0],v[1]+.1] for k, v in pos.items()}
+        shifted_pos = {k:[v[0],v[1]+.35] for k, v in pos.items()}
         nx.draw_networkx_labels(G, shifted_pos, clip_on=False)
-        nx.draw_networkx_labels(G, pos, node_inventory_quantity_dict, clip_on=False)
+        nx.draw_networkx_labels(G, pos=pos, ax=ax, labels=node_inventory_quantity_dict, clip_on=False)
         
         # Plot the edges
-        nx.draw_networkx_edges(G, pos, edgelist=G.edges, arrows=True)
+        nx.draw_networkx_edges(G, pos=pos, ax=ax, edgelist=G.edges, arrows=True)
 
         # Create a dictionary with the total quantity of product currently in transit
         # Plot as edge labels
@@ -149,7 +164,7 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
             edge_shipment_quantity_dict[edge_ends] = 0
             for shipment in edges_details['shipments']:
                 edge_shipment_quantity_dict[edge_ends] += shipment['quantity']
-        nx.draw_networkx_edge_labels(G, pos, edge_shipment_quantity_dict)
+        nx.draw_networkx_edge_labels(G, pos=pos, ax=ax, edge_labels=edge_shipment_quantity_dict)
 
         # Add a legend
         plt.legend()
