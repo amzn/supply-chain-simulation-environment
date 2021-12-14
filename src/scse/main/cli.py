@@ -4,6 +4,9 @@ import argparse
 import cmd2
 import pprint
 import networkx as nx
+from itertools import cycle
+from collections import defaultdict
+import matplotlib.pyplot as plt
 from scse.controller import miniscot as miniSCOT
 
 class MiniSCOTDebuggerApp(cmd2.Cmd):
@@ -88,8 +91,18 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
             msg = pprint.pformat(self._actions)
         elif args == 'orders':
             msg = pprint.pformat(self._state['customer_orders'])
+        elif args == 'order_hist':
+            msg = pprint.pformat(self._state['customer_order_history'])
         elif args == "POs":
             msg = pprint.pformat(self._state['purchase_orders'])
+        elif args == 'po_hist':
+            msg = pprint.pformat(self._state['purchase_order_history'])
+        elif args == 'inbound_shipments':
+            msg = pprint.pformat(self._state['inbound_shipment_history'])
+        elif args == 'outbound_shipments':
+            msg = pprint.pformat(self._state['outbound_shipment_history'])
+        elif args == 'transfer_shipments':
+            msg = pprint.pformat(self._state['transfer_shipment_history'])
         elif args == "reward":
             msg = pprint.pformat(self._reward)
         else:
