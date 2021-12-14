@@ -70,7 +70,7 @@ class NationalGridNetwork(Env):
         # Only one for now - more can be added at later date
         G.add_node("Consumers",
                     node_type = 'customer',
-                    location = (0.0, 0.0),
+                    location = (3.0, 3.0),
                     delivered = 0
                     )
 
