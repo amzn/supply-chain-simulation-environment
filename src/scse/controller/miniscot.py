@@ -254,6 +254,8 @@ class SupplyChainEnvironment:
             state['date_time'] += datetime.timedelta(days=1)
         elif self._time_increment == 'hourly':
             state['date_time'] += datetime.timedelta(hours=1)
+        elif self._time_increment == 'half-hourly':
+            state['date_time'] += datetime.timedelta(hours=0.5)
         else:
             raise ValueError("Unknown time increment arg".format(self._time_increment))
 
@@ -293,10 +295,10 @@ class SupplyChainEnvironment:
 
         # Update only after the other components have been retrieved to avoid
         # chances of corruption.
-        # assert origin_data["inventory"][asin] >= quantity
+        # assert origin_data["inventory"][asin] >= quantity, or `allow_negative` is True
         # vendors may not have a notion of inventory (e.g. maybe just confirmation rate)
         if 'inventory' in origin_data:
-            if quantity <= origin_data['inventory'][asin]:
+            if quantity <= origin_data['inventory'][asin] or origin_data.get('allow_negative', False):
                 origin_data['inventory'][asin] -= quantity
             else:
                 raise ValueError("Action tried to transfer {} units of {} from {} to {}, but {} only had {} units of inventory for this ASIN!".format(quantity, asin, origin, destination, origin, origin_data['inventory'][asin]))
