@@ -33,17 +33,17 @@ class NationalGridNetwork(Env):
         G.add_node("Solar",
                     node_type = 'vendor',
                     asins_produced = ['solar'],
-                    location = (0.0, 0.0)
+                    location = (-4.216477053445252, 50.7134720325634)
                     )
         G.add_node("Wind Onshore",
                     node_type = 'vendor',
                     asins_produced = ['wind_onshore'],
-                    location = (0.1, 0.1)
+                    location = (-3.0223770988897174, 57.29950745888362)
                     )
         G.add_node("Fossil Gas",
                     node_type = 'vendor',
                     asins_produced = ['fossil_gas'],
-                    location = (0.2, 0.2)
+                    location = (-3.4726115079844275, 52.48838509810871)
                     )
 
         # "Port": electricity substations
@@ -53,7 +53,7 @@ class NationalGridNetwork(Env):
         # Added `allow_negative` property
         G.add_node("Substation",
                     node_type = 'port',
-                    location = (1.0, 1.0),
+                    location = (-1.47591978069484, 53.02151541873239),
                     inventory = dict.fromkeys(asin_list, self._initial_inventory),
                     allow_negative = True
                     )
@@ -62,7 +62,7 @@ class NationalGridNetwork(Env):
         # Only one for now - more can be added at later date
         G.add_node("Battery",
                     node_type = 'warehouse',
-                    location = (2.0, 2.0),
+                    location = (-1.207637136122046, 51.547526847219395),
                     inventory = dict.fromkeys(asin_list, self._initial_inventory)
                     )
 
@@ -70,7 +70,7 @@ class NationalGridNetwork(Env):
         # Only one for now - more can be added at later date
         G.add_node("Consumers",
                     node_type = 'customer',
-                    location = (3.0, 3.0),
+                    location = (-0.17563780900605935, 51.633920790187155),
                     delivered = 0
                     )
 
