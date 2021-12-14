@@ -86,6 +86,7 @@ setup(
         'docker == 5.0.3',
         'requests == 2.26.0',
         'gym == 0.21.0',
+        'matplotlib==3.5.1',
     ],
     setup_requires=[
         'pytest-runner',

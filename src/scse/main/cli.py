@@ -110,6 +110,53 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
 
         self.poutput(msg)
 
+    def do_visualise(self, _):
+        """Visualise the network"""
+
+        # Make sure any pre-existing figures are closed
+        plt.close()
+
+        # Get the graph object and node positions
+        G = self._state['network']
+        pos = nx.spring_layout(G)
+
+        # Create a dictionary of nodes by type, and of total holdings at each node
+        node_type_dict = defaultdict(list)
+        node_inventory_quantity_dict = defaultdict(int)
+        for node_name, node_details in G.nodes.items():
+            node_type_dict[node_details['node_type']].append(node_name)
+
+            node_inventory_quantity_dict[node_name] += sum(node_details.get('inventory', {None: 0}).values())
+            node_inventory_quantity_dict[node_name] += node_details.get('delivered', 0)
+
+        # Plot the nodes, with a different colour for each type
+        color_cycle = cycle(['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd'])
+        for node_type, node_names in node_type_dict.items():
+            nx.draw_networkx_nodes(G, pos, nodelist=node_names, node_color=next(color_cycle), label=node_type)
+
+        # Add two sets of node labels - name and quantity of product held
+        shifted_pos = {k:[v[0],v[1]+.1] for k, v in pos.items()}
+        nx.draw_networkx_labels(G, shifted_pos, clip_on=False)
+        nx.draw_networkx_labels(G, pos, node_inventory_quantity_dict, clip_on=False)
+        
+        # Plot the edges
+        nx.draw_networkx_edges(G, pos, edgelist=G.edges, arrows=True)
+
+        # Create a dictionary with the total quantity of product currently in transit
+        # Plot as edge labels
+        edge_shipment_quantity_dict = defaultdict(int)
+        for edge_ends, edges_details in G.edges.items():
+            edge_shipment_quantity_dict[edge_ends] = 0
+            for shipment in edges_details['shipments']:
+                edge_shipment_quantity_dict[edge_ends] += shipment['quantity']
+        nx.draw_networkx_edge_labels(G, pos, edge_shipment_quantity_dict)
+
+        # Add a legend
+        plt.legend()
+
+        # Display the plot
+        plt.show()
+
     def _print_nodes(self):
         return pprint.pformat([(node, node_data) for node, node_data in self._state['network'].nodes(data = True)])
 
