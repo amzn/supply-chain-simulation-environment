@@ -1,20 +1,22 @@
 import logging
 
 from scse.api.module import Agent
+from scse.services.service_registry import singleton as registry
 
 logger = logging.getLogger(__name__)
 
 
-class ConstantDemand(Agent):
-    _DEFAULT_AMOUNT = 10
+class ElectricityDemand(Agent):
     _DEFAULT_ASIN = 'electricity'
     _DEFAULT_CUSTOMER = 'Consumers'
 
     def __init__(self, run_parameters):
         """
-        Simulates time invariant electricity demand from a single customer.
+        Simulates electricity demand from a single consumer/customer.
+
+        Demand forecast is provided by a service.
         """
-        self._amount = run_parameters.get('constant_demand_amount', self._DEFAULT_AMOUNT)
+        self._demand_forecast_service = registry.load_service('electricity_demand_forecast_service', run_parameters)
         self._asin = run_parameters.get('constant_demand_asin', self._DEFAULT_ASIN)
         self._customer = run_parameters.get('constant_demand_customer', self._DEFAULT_CUSTOMER)
 
@@ -29,17 +31,20 @@ class ConstantDemand(Agent):
         Creates a single action/order for a constant amount of electricity.
         """
         actions = []
+        current_time = state['date_time']
+
+        forecasted_demand = self._demand_forecast_service.get_forecast(current_time)
 
         action = {
             'type': 'customer_order',
             'asin': self._asin,
             'origin': None,  # The customer cannot request where the electricity comes from
             'destination': self._customer,
-            'quantity': self._amount,
+            'quantity': forecasted_demand,
             'schedule': state['clock']
         }
             
-        logger.debug(f"{self._customer} requested {self._amount} units of {self._asin}.")
+        logger.debug(f"{self._customer} requested {forecasted_demand} units of {self._asin}.")
 
         actions.append(action)
 
