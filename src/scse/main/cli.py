@@ -192,7 +192,12 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
                 nx.draw_networkx_edge_labels(G, pos=pos, ax=ax, edge_labels={k: v}, bbox={'alpha': 0})
 
         # Add a legend
-        plt.legend()
+        ax.legend()
+
+        # Add title showing current clock and time values
+        current_clock = self._state['clock']
+        current_time = self._state['date_time']
+        ax.set_title(f"Clock: {current_clock}; Time: {current_time}")
 
         # Display the plot
         plt.show()
