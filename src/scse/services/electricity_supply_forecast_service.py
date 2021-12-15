@@ -26,6 +26,12 @@ class ElectricitySupplyForecast(Service):
             self._asin_list = context['asin_list']
             
     def get_forecast(self, asin, time):
+        """
+        NOTE: Given a time, the forecast must be deterministic.
+        i.e. the same forecast is returned when the same arguments
+        are passed.
+        """
+
         # Check for data entry errors
         if asin not in self._asin_list:
             raise ValueError(f"Electricity supply forecast query failed: {asin} not in asin_list of environment.")
