@@ -6,7 +6,8 @@
     "scse.modules.topology.national_grid_network.NationalGridNetwork",
     "scse.modules.customer.national_grid_demand.ElectricityDemand",
     "scse.modules.fulfillment.national_grid_closest_substation_fulfillment.ClosestSubstationFulfillment",
-    "scse.modules.vendor.national_grid_supply.ElectricitySupply"
+    "scse.modules.vendor.national_grid_supply.ElectricitySupply",
+    "scse.modules.placement.national_grid_store_excess_supply.StoreExcessSupply"
   ],
   "metrics": ["scse.metrics.demo_newsvendor_cash_accounting.CashAccounting"]
 }
