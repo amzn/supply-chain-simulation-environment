@@ -23,6 +23,12 @@ class ElectricityDemandForecast(Service):
         pass
             
     def get_forecast(self, time):
+        """
+        NOTE: Given a time, the forecast must be deterministic.
+        i.e. the same forecast is returned when the same arguments
+        are passed.
+        """
+
         # Return the default value
         # TODO: Replace with trained models/emulators which use time
         demand_amount = self._amount
