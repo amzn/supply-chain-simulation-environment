@@ -8,15 +8,22 @@ logger = logging.getLogger(__name__)
 
 
 class StoreExcessSupply(Agent):
+    _DEFAULT_ASIN = 'electricity'
+
     def __init__(self, run_parameters):
         """
         Store all excess supply across battery network.
 
-        At the end of each timestep, excess supply is stored.
+        As with a number of other modules, only the `electricity`
+        ASIN is being considered at this time.
+
+        NOTE: This module does not consider the forecasted demand
+        in the next timestep - substations have no storage capacity,
+        and so must deposit excess into the battery reserves.
         """
         # Note: Ports demo service takes max capacity into account.
         # We might want to consider doing the same.
-        pass
+        self._asin = self._DEFAULT_ASIN
 
     def reset(self, context, state):
         self._asin_list = context['asin_list']
@@ -44,23 +51,25 @@ class StoreExcessSupply(Agent):
         # Go through the substations and identify any excess they currently have
         # Share the excess evenly across the battery network
         for substation, substation_data in substations:
-            for asin in self._asin_list:
-                onhand = get_asin_inventory_in_node(substation_data, asin)
+            onhand = get_asin_inventory_in_node(substation_data, self._asin)
 
-                if onhand > 0:
-                    logger.debug(f"Storing excess of {onhand} ASIN {asin} from substation {substation}.")
+            if onhand > 0:
+                logger.debug(f"Storing excess of {onhand} ASIN {self._asin} from substation {substation}.")
 
-                    for battery, battery_data in batteries:
-                        # Note: Whole number of MW being transmitted
-                        # Have not yet removed miniscot check preventing float
-                        action = {
-                            'type': 'transfer',
-                            'asin': asin,
-                            'quantity': math.floor(onhand/len(batteries)),
-                            'schedule': state['clock'],
-                            'origin': substation,
-                            'destination': battery
-                        }
-                        actions.append(action)
+                for battery, battery_data in batteries:
+                    # Note: Whole number of MW being transmitted
+                    # Have not yet removed miniscot check preventing float
+                    action = {
+                        'type': 'transfer',
+                        'asin': self._asin,
+                        'quantity': math.floor(onhand/len(batteries)),
+                        'schedule': state['clock'],
+                        'origin': substation,
+                        'destination': battery
+                    }
+                    actions.append(action)
+
+        if len(actions) == 0:
+            logger.debug("No action was required")
 
         return actions

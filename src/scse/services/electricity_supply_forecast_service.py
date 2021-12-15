@@ -25,13 +25,13 @@ class ElectricitySupplyForecast(Service):
         if self._asin_list != context['asin_list']:
             self._asin_list = context['asin_list']
             
-    def get_forecast(self, asin, current_time):
+    def get_forecast(self, asin, time):
         # Check for data entry errors
         if asin not in self._asin_list:
             raise ValueError(f"Electricity supply forecast query failed: {asin} not in asin_list of environment.")
 
         # Return the default value
-        # TODO: Replace with trained models/emulators which use ASIN and current_time
+        # TODO: Replace with trained models/emulators which use ASIN and time
         supply_amount = self._amount
 
         return supply_amount
