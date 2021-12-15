@@ -22,9 +22,9 @@ class ElectricityDemandForecast(Service):
         logger.debug("Resetting electricity demand forecast service.")
         pass
             
-    def get_forecast(self, current_time):
+    def get_forecast(self, time):
         # Return the default value
-        # TODO: Replace with trained models/emulators which use current_time
+        # TODO: Replace with trained models/emulators which use time
         demand_amount = self._amount
 
         return demand_amount
