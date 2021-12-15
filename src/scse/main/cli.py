@@ -4,7 +4,6 @@ import importlib
 import argparse
 import cmd2
 import pprint
-import time
 import networkx as nx
 from itertools import cycle
 from collections import defaultdict
