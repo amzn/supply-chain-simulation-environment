@@ -154,17 +154,42 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
         nx.draw_networkx_labels(G, shifted_pos, clip_on=False)
         nx.draw_networkx_labels(G, pos=pos, ax=ax, labels=node_inventory_quantity_dict, clip_on=False)
         
-        # Plot the edges
-        nx.draw_networkx_edges(G, pos=pos, ax=ax, edgelist=G.edges, arrows=True)
-
-        # Create a dictionary with the total quantity of product currently in transit
-        # Plot as edge labels
-        edge_shipment_quantity_dict = defaultdict(int)
-        for edge_ends, edges_details in G.edges.items():
-            edge_shipment_quantity_dict[edge_ends] = 0
+        # Identify uni and bidirectional edges; record the total quantity of product in transit along each edge
+        unidirectional_edges = {}
+        bidirectional_edges = {}
+        for edge_start, edge_end, edges_details in G.edges(data=True):
+            if (edge_end, edge_start) in unidirectional_edges:
+                # Move entry from unidirectional edge dict to bidirectional dict
+                bidirectional_edges[(edge_end, edge_start)] = unidirectional_edges[(edge_end, edge_start)]
+                del unidirectional_edges[(edge_end, edge_start)]
+                edge_dict = bidirectional_edges
+            else:
+                edge_dict = unidirectional_edges
+            
+            edge_dict[(edge_start, edge_end)] = 0
             for shipment in edges_details['shipments']:
-                edge_shipment_quantity_dict[edge_ends] += shipment['quantity']
-        nx.draw_networkx_edge_labels(G, pos=pos, ax=ax, edge_labels=edge_shipment_quantity_dict)
+                edge_dict[(edge_start, edge_end)] += shipment['quantity']
+
+        # Plot the unidirectional edges as straight lines and add labels
+        nx.draw_networkx_edges(G, pos=pos, ax=ax, edgelist=unidirectional_edges, arrows=True)
+        nx.draw_networkx_edge_labels(G, pos=pos, ax=ax, edge_labels=unidirectional_edges)
+
+        # Plot the bidirectional edges as curves and add labels
+        for k, v in bidirectional_edges.items():
+            edge_start, edge_end = k
+
+            # Edge is plotted in red if there is flow along it, else it is dashed
+            if v != 0: 
+                nx.draw_networkx_edges(G, pos=pos, ax=ax, edgelist=[k], arrows=True, connectionstyle='arc3,rad=0.2', width=1.5, edge_color='r')
+            else:
+                nx.draw_networkx_edges(G, pos=pos, ax=ax, edgelist=[k], arrows=True, connectionstyle='arc3,rad=0.2', style='--')
+
+            # If there is flow in both directions then indicate this using x/y label; else only label with single quantity
+            # There will be no label if there is no flow in either direction
+            if v != 0 and bidirectional_edges[(edge_end, edge_start)] != 0:
+                nx.draw_networkx_edge_labels(G, pos=pos, ax=ax, edge_labels={k: f'{v}/{bidirectional_edges[(edge_end, edge_start)]}'}, bbox={'alpha': 0})
+            elif v != 0:
+                nx.draw_networkx_edge_labels(G, pos=pos, ax=ax, edge_labels={k: v}, bbox={'alpha': 0})
 
         # Add a legend
         plt.legend()
