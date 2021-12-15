@@ -66,7 +66,8 @@ class NationalGridNetwork(Env):
         G.add_node("Battery",
                     node_type = 'warehouse',
                     location = (-1.207637136122046, 51.547526847219395),
-                    inventory = dict.fromkeys(asin_list, self._initial_inventory)
+                    # inventory = dict.fromkeys(asin_list, self._initial_inventory),
+                    inventory = {'electricity': 100}
                     )
 
         # Consumers

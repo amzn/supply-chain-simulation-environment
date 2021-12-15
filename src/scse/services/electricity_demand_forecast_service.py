@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 class ElectricityDemandForecast(Service):
-    _DEFAULT_AMOUNT = 10
+    _DEFAULT_AMOUNT = 40
 
     def __init__(self, run_parameters):
         """
