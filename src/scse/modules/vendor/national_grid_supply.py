@@ -34,7 +34,7 @@ class ElectricitySupply(Agent):
         # Get a list of substations - remember that these have the type `port` for now
         substations = []
         for node, node_data in G.nodes(data=True):
-            if node_data.get('node_type') == 'port':
+            if node_data.get('node_type') in ['port']:
                 substations.append(node)
         
         if len(substations) == 0:

@@ -32,17 +32,20 @@ class NationalGridNetwork(Env):
         # Added `asins_produced` property
         G.add_node("Solar",
                     node_type = 'vendor',
-                    asins_produced = ['solar'],
+                    # asins_produced = ['solar'],
+                    asins_produced = ['electricity'],
                     location = (-4.216477053445252, 50.7134720325634)
                     )
         G.add_node("Wind Onshore",
                     node_type = 'vendor',
-                    asins_produced = ['wind_onshore'],
+                    # asins_produced = ['wind_onshore'],
+                    asins_produced = ['electricity'],
                     location = (-3.0223770988897174, 57.29950745888362)
                     )
         G.add_node("Fossil Gas",
                     node_type = 'vendor',
-                    asins_produced = ['fossil_gas'],
+                    # asins_produced = ['fossil_gas'],
+                    asins_produced = ['electricity'],
                     location = (-3.4726115079844275, 52.48838509810871)
                     )
 
