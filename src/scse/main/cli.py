@@ -4,6 +4,7 @@ import importlib
 import argparse
 import cmd2
 import pprint
+import time
 import networkx as nx
 from itertools import cycle
 from collections import defaultdict
@@ -73,13 +74,27 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
         """Execute a single time unit."""
         self._state, self._actions, self._reward = self._env.step(self._state, self._actions)
 
-    def do_run(self, arguments):
-        """Run simulation until the first break-point or, if none are enabled, until the end of time (the specified horizon)."""
+    def do_run(self, arguments, visual=False):
+        """
+        Run simulation until the first break-point or, if none are enabled, until the end of time (the specified horizon).
+        
+        If `visual=True` then call `do_visualise` on each step. Press q to iterate through steps.
+        """
+        if visual:
+            self.do_visualise(None)
         for t in range(self._state['clock'], self._horizon):
             if t in self._breakpoints:
                 break
             else:
                 self._state, self._actions, self._reward = self._env.step(self._state, self._actions)
+                if visual:
+                    self.do_visualise(None)
+
+    def do_visual_run(self, arguments):
+        """
+        Executes `do_run` with `visual=True` argument.
+        """
+        self.do_run(arguments, visual=True)
 
     def do_print(self, args):
         """Print variables."""
@@ -200,7 +215,7 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
         ax.set_title(f"Clock: {current_clock}; Time: {current_time}")
 
         # Display the plot
-        plt.show()
+        plt.show(block=True)
 
     def _print_nodes(self):
         return pprint.pformat([(node, node_data) for node, node_data in self._state['network'].nodes(data = True)])
