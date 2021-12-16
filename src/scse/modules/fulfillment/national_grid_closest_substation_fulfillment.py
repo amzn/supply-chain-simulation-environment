@@ -1,6 +1,8 @@
 import logging
 
 from scse.api.module import Agent
+from scse.constants.national_grid_constants import ELECTRICITY_ASIN
+
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +45,7 @@ class ClosestSubstationFulfillment(Agent):
         # Loop through and fulfil customer orders
         for order in state['customer_orders']:
             asin = order['asin']
-            if asin != 'electricity':
+            if asin != ELECTRICITY_ASIN:
                 raise ValueError("At present, only customer orders for generic electricity are supported.")
 
             customer_id = order['destination']
