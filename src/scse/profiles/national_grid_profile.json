@@ -12,5 +12,5 @@
     "scse.modules.placement.national_grid_battery_drawdown.BatteryDrawdown",
     "scse.modules.placement.national_grid_balance_excess_demand.BalanceExcessDemand"
   ],
-  "metrics": ["scse.metrics.demo_newsvendor_cash_accounting.CashAccounting"]
+  "metrics": ["scse.metrics.national_grid_cash_accounting.CashAccounting"]
 }
