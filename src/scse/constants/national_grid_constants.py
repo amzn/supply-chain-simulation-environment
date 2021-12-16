@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+PERIOD_LENGTH_HOURS = 0.5
+
 ELECTRICITY_ASIN: str = 'electricity'
 
 @dataclass

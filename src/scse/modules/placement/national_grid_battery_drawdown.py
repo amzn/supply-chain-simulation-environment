@@ -4,12 +4,15 @@ import datetime
 from scse.api.module import Agent
 from scse.api.network import get_asin_inventory_on_inbound_arcs_to_node
 from scse.services.service_registry import singleton as registry
+from scse.constants.national_grid_constants import (
+    ELECTRICITY_ASIN, PERIOD_LENGTH_HOURS
+)
 
 logger = logging.getLogger(__name__)
 
 
 class BatteryDrawdown(Agent):
-    _DEFAULT_ASIN = 'electricity'
+    _DEFAULT_ASIN = ELECTRICITY_ASIN
 
     def __init__(self, run_parameters):
         """
@@ -38,7 +41,7 @@ class BatteryDrawdown(Agent):
         actions = []
         current_clock = state['clock']
         current_time = state['date_time']
-        next_time = current_time + datetime.timedelta(hours=0.5)
+        next_time = current_time + datetime.timedelta(hours=PERIOD_LENGTH_HOURS)
         
         G = state['network']
 
