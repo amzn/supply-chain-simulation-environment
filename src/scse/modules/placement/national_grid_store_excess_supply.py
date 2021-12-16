@@ -22,10 +22,8 @@ class StoreExcessSupply(Agent):
 
         NOTE: This module does not consider the forecasted demand
         in the next timestep - substations have no storage capacity,
-        and so must deposit excess into the battery reserves.
+        and so must deposit excess into available battery reserves.
         """
-        # Note: Ports demo service takes max capacity into account.
-        # We might want to consider doing the same.
         self._asin = self._DEFAULT_ASIN
 
     def reset(self, context, state):

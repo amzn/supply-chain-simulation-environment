@@ -35,12 +35,12 @@ class NationalGridNetwork(Env):
         G.add_node("Solar",
                     node_type = 'vendor',
                     asins_produced = [ENERGY_GENERATION_ASINS.solar],
-                    location = (-4.216477053445252, 50.7134720325634)
+                    location = (-3.7625904850106417, 50.485070023807836)
                     )
         G.add_node("Wind Onshore",
                     node_type = 'vendor',
                     asins_produced = [ENERGY_GENERATION_ASINS.wind_onshore],
-                    location = (-3.0223770988897174, 57.29950745888362)
+                    location = (-4.369099752793398, 56.95015978364187)
                     )
         G.add_node("Fossil Gas",
                     node_type = 'vendor',
@@ -64,7 +64,7 @@ class NationalGridNetwork(Env):
         # Only one for now - more can be added at later date
         G.add_node("Battery",
                     node_type = 'warehouse',
-                    location = (-1.207637136122046, 51.547526847219395),
+                    location = (-1.5549031279170884, 51.42927817167841),
                     # inventory = dict.fromkeys(asin_list, self._initial_inventory),
                     inventory = {ELECTRICITY_ASIN: 100},
                     max_inventory = {ELECTRICITY_ASIN: 200}
@@ -75,6 +75,14 @@ class NationalGridNetwork(Env):
         G.add_node("Consumers",
                     node_type = 'customer',
                     location = (-0.17563780900605935, 51.633920790187155),
+                    delivered = 0
+                    )
+
+        # Balance Mechanism
+        # Sink, and eventually source, for maintaining balance at substations.
+        G.add_node("Balance Sink",
+                    node_type = 'customer',
+                    location = (-0.6827303448677813, 54.107893307767526),
                     delivered = 0
                     )
 
@@ -97,5 +105,8 @@ class NationalGridNetwork(Env):
 
         # Substation to customer
         G.add_edge("Substation", "Consumers", **{'transit_time': self._transit_time, 'shipments': []})
+
+        # Substation to balance sink
+        G.add_edge("Substation", "Balance Sink", **{'transit_time': self._transit_time, 'shipments': []})
 
         return G
