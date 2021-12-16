@@ -5,12 +5,13 @@ from scse.api.module import Agent
 from scse.api.network import (
     get_asin_inventory_in_node, get_asin_max_inventory_in_node
 )
+from scse.constants.national_grid_constants import ELECTRICITY_ASIN
 
 logger = logging.getLogger(__name__)
 
 
 class StoreExcessSupply(Agent):
-    _DEFAULT_ASIN = 'electricity'
+    _DEFAULT_ASIN = ELECTRICITY_ASIN
 
     def __init__(self, run_parameters):
         """

@@ -27,6 +27,8 @@ class ElectricitySupplyForecast(Service):
             
     def get_forecast(self, asin, time):
         """
+        Generate a supply forcast for the given ASIN/electricity generation type.
+
         NOTE: Given a time, the forecast must be deterministic.
         i.e. the same forecast is returned when the same arguments
         are passed.

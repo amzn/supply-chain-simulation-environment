@@ -1,11 +1,14 @@
+import logging
+
 from scse.api.module import Agent
 from scse.services.service_registry import singleton as registry
+from scse.constants.national_grid_constants import ELECTRICITY_ASIN, ENERGY_GENERATION_ASINS
 
-import logging
 logger = logging.getLogger(__name__)
 
 
 class ElectricitySupply(Agent):
+    _DEFAULT_SUPPLY_ASIN = ELECTRICITY_ASIN
 
     def __init__(self, run_parameters):
         """
@@ -13,6 +16,7 @@ class ElectricitySupply(Agent):
 
         Supply forecast is provided by a service.
         """
+        self._supply_asin = self._DEFAULT_SUPPLY_ASIN
         self._supply_forecast_service = registry.load_service('electricity_supply_forecast_service', run_parameters)
 
     def get_name(self):
@@ -59,9 +63,10 @@ class ElectricitySupply(Agent):
                 
                 logger.debug(f"Supply for {forecasted_supply} quantity of ASIN {generation_type}.")
 
+                # Note: The default ASIN is sent (i.e. electricity), regardless of generation type
                 action = {
                     'type': 'inbound_shipment',
-                    'asin': generation_type,
+                    'asin': self._supply_asin,
                     'origin': node,
                     'destination': substation,
                     'quantity': forecasted_supply,

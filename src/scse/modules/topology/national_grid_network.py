@@ -1,5 +1,7 @@
 import networkx as nx
+
 from scse.api.module import Env
+from scse.constants.national_grid_constants import ELECTRICITY_ASIN, ENERGY_GENERATION_ASINS
 
 
 class NationalGridNetwork(Env):
@@ -32,20 +34,17 @@ class NationalGridNetwork(Env):
         # Added `asins_produced` property
         G.add_node("Solar",
                     node_type = 'vendor',
-                    # asins_produced = ['solar'],
-                    asins_produced = ['electricity'],
+                    asins_produced = [ENERGY_GENERATION_ASINS.solar],
                     location = (-4.216477053445252, 50.7134720325634)
                     )
         G.add_node("Wind Onshore",
                     node_type = 'vendor',
-                    # asins_produced = ['wind_onshore'],
-                    asins_produced = ['electricity'],
+                    asins_produced = [ENERGY_GENERATION_ASINS.wind_onshore],
                     location = (-3.0223770988897174, 57.29950745888362)
                     )
         G.add_node("Fossil Gas",
                     node_type = 'vendor',
-                    # asins_produced = ['fossil_gas'],
-                    asins_produced = ['electricity'],
+                    asins_produced = [ENERGY_GENERATION_ASINS.fossil_gas],
                     location = (-3.4726115079844275, 52.48838509810871)
                     )
 
@@ -67,8 +66,8 @@ class NationalGridNetwork(Env):
                     node_type = 'warehouse',
                     location = (-1.207637136122046, 51.547526847219395),
                     # inventory = dict.fromkeys(asin_list, self._initial_inventory),
-                    inventory = {'electricity': 100},
-                    max_inventory = {'electricity': 200}
+                    inventory = {ELECTRICITY_ASIN: 100},
+                    max_inventory = {ELECTRICITY_ASIN: 200}
                     )
 
         # Consumers
