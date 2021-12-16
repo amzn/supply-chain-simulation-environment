@@ -222,6 +222,9 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
         current_time = self._state['date_time']
         ax.set_title(f"Clock: {current_clock}; Time: {current_time}")
 
+        # Display the legend
+        plt.legend()
+
         # Display the plot
         plt.show(block=True)
 

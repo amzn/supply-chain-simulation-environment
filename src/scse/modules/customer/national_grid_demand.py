@@ -2,14 +2,16 @@ import logging
 
 from scse.api.module import Agent
 from scse.services.service_registry import singleton as registry
-from scse.constants.national_grid_constants import ELECTRICITY_ASIN
+from scse.constants.national_grid_constants import (
+    ELECTRICITY_ASIN, DEFAULT_CONSUMER
+)
 
 logger = logging.getLogger(__name__)
 
 
 class ElectricityDemand(Agent):
     _DEFAULT_ASIN = ELECTRICITY_ASIN
-    _DEFAULT_CUSTOMER = 'Consumers'
+    _DEFAULT_CUSTOMER = DEFAULT_CONSUMER
 
     def __init__(self, run_parameters):
         """
