@@ -1,6 +1,7 @@
 import logging
 
 from scse.api.module import Service
+from scse.constants.national_grid_constants import ENERGY_GENERATION_ASINS
 
 logger = logging.getLogger(__name__)
 
@@ -27,17 +28,22 @@ class ElectricitySupplyForecast(Service):
             
     def get_forecast(self, asin, time):
         """
+        Generate a supply forcast for the given ASIN/electricity generation type,
+        and the given time.
+
         NOTE: Given a time, the forecast must be deterministic.
         i.e. the same forecast is returned when the same arguments
         are passed.
         """
 
-        # Check for data entry errors
-        if asin not in self._asin_list:
-            raise ValueError(f"Electricity supply forecast query failed: {asin} not in asin_list of environment.")
-
-        # Return the default value
-        # TODO: Replace with trained models/emulators which use ASIN and time
-        supply_amount = self._amount
-
-        return supply_amount
+        if asin == ENERGY_GENERATION_ASINS.solar:
+            if time.hour <= 8 or time.hour >= 18:
+                return 0
+            else:
+                return self._amount
+        elif asin == ENERGY_GENERATION_ASINS.wind_onshore:
+            return self._amount * 2
+        elif asin == ENERGY_GENERATION_ASINS.fossil_gas:
+            return self._amount * 3
+        else:
+            raise ValueError(f"Electricity supply forecast query failed: {asin} not recognised.")

@@ -1,6 +1,7 @@
 import logging
 
 from scse.api.module import Env
+from scse.constants.national_grid_constants import ELECTRICITY_ASIN, ENERGY_GENERATION_ASINS
 
 logger = logging.getLogger(__name__)
 
@@ -22,9 +23,9 @@ class SourcesSelectionAgent(Env):
             if self._asin_selection == 0:
                 # Default to return all supported electricity source types
                 asin_list = [
-                    "solar",
-                    "wind_onshore",
-                    "fossil_gas",
+                    ENERGY_GENERATION_ASINS.solar,
+                    ENERGY_GENERATION_ASINS.wind_onshore,
+                    ENERGY_GENERATION_ASINS.fossil_gas
                 ]
             else:
                 raise ValueError("""
@@ -37,9 +38,9 @@ class SourcesSelectionAgent(Env):
             asin_selection run parameter.
             """)
 
-        # Add generic "electricity" to list
+        # Add generic `electricity` to list
         # This is what substations (aka ports) and batteries (aka warehouses) deal in
-        asin_list.append("electricity")
+        asin_list.append(ELECTRICITY_ASIN)
 
         logger.debug(f"Electricity sources selected = {asin_list}.")
         return asin_list
