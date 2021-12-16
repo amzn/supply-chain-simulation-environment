@@ -18,6 +18,12 @@ class ElectricityDemand(Agent):
         Simulates electricity demand from a single consumer/customer.
 
         Demand forecast is provided by a service.
+
+        NOTE: The balance mechanism sink is currently modelled as a
+        customer. Therefore, we cannot simply loop through all
+        customers if we were to add more to the network. However, it
+        could be the responsibility of the demand service to identify
+        the sink and ensure it always has 0 demand.
         """
         self._demand_forecast_service = registry.load_service('electricity_demand_forecast_service', run_parameters)
         self._asin = run_parameters.get('constant_demand_asin', self._DEFAULT_ASIN)
@@ -31,7 +37,7 @@ class ElectricityDemand(Agent):
 
     def compute_actions(self, state):
         """
-        Creates a single action/order for a constant amount of electricity.
+        Creates a single action/order for an amount of electricity.
         """
         actions = []
         current_time = state['date_time']

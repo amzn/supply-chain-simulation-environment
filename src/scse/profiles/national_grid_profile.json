@@ -9,7 +9,8 @@
     "scse.modules.vendor.national_grid_supply.ElectricitySupply",
     "scse.modules.placement.national_grid_store_excess_supply.StoreExcessSupply",
     "scse.modules.placement.national_grid_balance_excess_supply.BalanceExcessSupply",
-    "scse.modules.placement.national_grid_battery_drawdown.BatteryDrawdown"
+    "scse.modules.placement.national_grid_battery_drawdown.BatteryDrawdown",
+    "scse.modules.placement.national_grid_balance_excess_demand.BalanceExcessDemand"
   ],
   "metrics": ["scse.metrics.demo_newsvendor_cash_accounting.CashAccounting"]
 }

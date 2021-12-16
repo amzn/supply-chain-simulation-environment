@@ -79,10 +79,17 @@ class NationalGridNetwork(Env):
                     )
 
         # Balance Mechanism
-        # Sink, and eventually source, for maintaining balance at substations.
+        # Source and sink for maintaining balance at substations.
+        # Note that the source has been modelled as a vendor, and the sink
+        # as a customer.
+        G.add_node("Balance Source",
+                    node_type = 'vendor',
+                    asins_produced = [ELECTRICITY_ASIN],
+                    location = (-0.6827303448677813, 54.107893307767526)
+                    )
         G.add_node("Balance Sink",
                     node_type = 'customer',
-                    location = (-0.6827303448677813, 54.107893307767526),
+                    location = (1.0740887603185447, 52.53358756872671),
                     delivered = 0
                     )
 
@@ -105,6 +112,9 @@ class NationalGridNetwork(Env):
 
         # Substation to customer
         G.add_edge("Substation", "Consumers", **{'transit_time': self._transit_time, 'shipments': []})
+
+        # Balance source to substation
+        G.add_edge("Balance Source", "Substation", **{'transit_time': self._transit_time, 'shipments': []})
 
         # Substation to balance sink
         G.add_edge("Substation", "Balance Sink", **{'transit_time': self._transit_time, 'shipments': []})

@@ -2,7 +2,7 @@ import logging
 
 from scse.api.module import Agent
 from scse.services.service_registry import singleton as registry
-from scse.constants.national_grid_constants import ELECTRICITY_ASIN, ENERGY_GENERATION_ASINS
+from scse.constants.national_grid_constants import DEFAULT_BALANCE_SOURCE, ELECTRICITY_ASIN
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +15,12 @@ class ElectricitySupply(Agent):
         Simulates electricity supply from all sources.
 
         Supply forecast is provided by a service.
+
+        NOTE: The balance mechanism source is currently modelled as a
+        vendor. Therefore, we cannot simply loop through all
+        vendors - we must exclude the balance source. A simple method
+        of doing this is implemented below, but we may want to find a
+        more robust solution.
         """
         self._supply_asin = self._DEFAULT_SUPPLY_ASIN
         self._supply_forecast_service = registry.load_service('electricity_supply_forecast_service', run_parameters)
@@ -27,7 +33,9 @@ class ElectricitySupply(Agent):
 
     def compute_actions(self, state):
         """
-        Create constant supply from each source.
+        Simulate a supply of electricity from each source.
+
+        NOTE: Only supports having a single substation currently.
         """
         actions = []
         current_time = state['date_time']
@@ -49,8 +57,9 @@ class ElectricitySupply(Agent):
         substation = substations[0]
 
         # Create shipment from every vendor (i.e. electricity supply) to substation
+        # NOTE: Do not create demand from balance source. TODO: Find a better method of avoiding.
         for node, node_data in G.nodes(data=True):
-            if node_data.get('node_type') == 'vendor':
+            if node_data.get('node_type') == 'vendor' and node != DEFAULT_BALANCE_SOURCE:
                 # Determine how the vendor produces electricity
                 generation_types = node_data.get('asins_produced')
                 if generation_types is None:
