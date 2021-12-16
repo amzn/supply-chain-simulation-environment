@@ -162,6 +162,8 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
             onhand += sum(node_details.get('inventory', {None: 0}).values())
             onhand += node_details.get('delivered', 0)
 
+            # Very rudimentary way of determining a node is over capacity
+            # Could be that it is over capacity for one ASIN, but below capacity for all the others
             text_col = 'k'
             if onhand < 0 or onhand >= sum(node_details.get('max_inventory', {None: 10e10}).values()):
                 text_col = 'r'
