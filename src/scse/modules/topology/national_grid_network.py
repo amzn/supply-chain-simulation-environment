@@ -67,7 +67,8 @@ class NationalGridNetwork(Env):
                     node_type = 'warehouse',
                     location = (-1.207637136122046, 51.547526847219395),
                     # inventory = dict.fromkeys(asin_list, self._initial_inventory),
-                    inventory = {'electricity': 100}
+                    inventory = {'electricity': 100},
+                    max_inventory = {'electricity': 200}
                     )
 
         # Consumers

@@ -149,25 +149,37 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
         G = self._state['network']
         pos = {node_name: node_data['location'] for node_name, node_data in G.nodes(data=True)}
 
-        # Create a dictionary of nodes by type, and of total holdings at each node
+        # Plot the nodes and node labels
+        # Each node type has its own color
+        # Nodes with negative capacity or capacity >= the max have red label
         node_type_dict = defaultdict(list)
-        node_inventory_quantity_dict = defaultdict(int)
         for node_name, node_details in G.nodes.items():
+            # This will be used when plotting the nodes
             node_type_dict[node_details['node_type']].append(node_name)
 
-            node_inventory_quantity_dict[node_name] += sum(node_details.get('inventory', {None: 0}).values())
-            node_inventory_quantity_dict[node_name] += node_details.get('delivered', 0)
+            # Determine the total inventory onhand
+            onhand = 0
+            onhand += sum(node_details.get('inventory', {None: 0}).values())
+            onhand += node_details.get('delivered', 0)
+
+            # Very rudimentary way of determining a node is over capacity
+            # Could be that it is over capacity for one ASIN, but below capacity for all the others
+            text_col = 'k'
+            if onhand < 0 or onhand >= sum(node_details.get('max_inventory', {None: 10e10}).values()):
+                text_col = 'r'
+
+            # Add label with quantity of product held
+            nx.draw_networkx_labels(G, pos=pos, ax=ax, labels={node_name: onhand}, font_color=text_col, clip_on=False)            
 
         # Plot the nodes, with a different colour for each type
         color_cycle = cycle(['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd'])
         for node_type, node_names in node_type_dict.items():
             nx.draw_networkx_nodes(G, pos=pos, ax=ax, nodelist=node_names, node_color=next(color_cycle), label=node_type)
 
-        # Add two sets of node labels - name and quantity of product held
+        # Add node names as labels
         shifted_pos = {k:[v[0],v[1]+.35] for k, v in pos.items()}
         nx.draw_networkx_labels(G, shifted_pos, clip_on=False)
-        nx.draw_networkx_labels(G, pos=pos, ax=ax, labels=node_inventory_quantity_dict, clip_on=False)
-        
+
         # Identify uni and bidirectional edges; record the total quantity of product in transit along each edge
         unidirectional_edges = {}
         bidirectional_edges = {}
@@ -204,9 +216,6 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
                 nx.draw_networkx_edge_labels(G, pos=pos, ax=ax, edge_labels={k: f'{v}/{bidirectional_edges[(edge_end, edge_start)]}'}, bbox={'alpha': 0})
             elif v != 0:
                 nx.draw_networkx_edge_labels(G, pos=pos, ax=ax, edge_labels={k: v}, bbox={'alpha': 0})
-
-        # Add a legend
-        ax.legend()
 
         # Add title showing current clock and time values
         current_clock = self._state['clock']

@@ -2,7 +2,9 @@ import logging
 import math
 
 from scse.api.module import Agent
-from scse.api.network import get_asin_inventory_in_node
+from scse.api.network import (
+    get_asin_inventory_in_node, get_asin_max_inventory_in_node
+)
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +41,10 @@ class StoreExcessSupply(Agent):
         batteries = []
         for node, node_data in G.nodes(data=True):
             if node_data.get('node_type') in ['warehouse']:
-                batteries.append((node, node_data))
+                # Need to keep track of what excess capacity is already being sent
+                module_copy = node_data.copy()
+                module_copy['incoming'] = 0
+                batteries.append((node, module_copy))
 
         # Get a list of substations - remember that these have the type `port` for now
         # Could have put below logic here; kept separation for readability
@@ -50,26 +55,51 @@ class StoreExcessSupply(Agent):
 
         # Go through the substations and identify any excess they currently have
         # Share the excess evenly across the battery network
+        # Potential future improvements:
+        # - Each battery fully filled until excess capacity is gone; could do more evenly
+        # - Fill closer batteries first
         for substation, substation_data in substations:
             onhand = get_asin_inventory_in_node(substation_data, self._asin)
 
             if onhand > 0:
-                logger.debug(f"Storing excess of {onhand} ASIN {self._asin} from substation {substation}.")
+                logger.debug(
+                    f"Attempting to store excess of {onhand} ASIN {self._asin} from substation {substation}."
+                    )
 
+                # Loop through batteries in the network - fill until excess is used, or batteries full
                 for battery, battery_data in batteries:
-                    # Note: Whole number of MW being transmitted
-                    # Have not yet removed miniscot check preventing float
+                    current_inventory = get_asin_inventory_in_node(battery_data, self._asin)
+                    max_inventory = get_asin_max_inventory_in_node(battery_data, self._asin)
+                    available_capacity = max_inventory - current_inventory - battery_data['incoming']
+
+                    if available_capacity == 0:
+                        logger.debug(f'Battery {battery} is already full')
+                        continue
+
+                    transfer_amount = min(onhand, available_capacity)
+                    onhand -= transfer_amount
+                    battery_data['incoming'] += transfer_amount
+
+                    logger.debug(
+                        f"Transferring {transfer_amount} of ASIN {self._asin} from substation {substation} to battery {battery}."
+                    )
+
                     action = {
                         'type': 'transfer',
                         'asin': self._asin,
-                        'quantity': math.floor(onhand/len(batteries)),
+                        'quantity': transfer_amount,
                         'schedule': state['clock'],
                         'origin': substation,
                         'destination': battery
                     }
                     actions.append(action)
 
+            if onhand > 0:
+                logger.debug(
+                    f"Excess of {onhand} ASIN {self._asin} will remain at substation {substation}."
+                )
+
         if len(actions) == 0:
-            logger.debug("No action was required")
+            logger.debug("No actions taken")
 
         return actions

@@ -50,6 +50,9 @@ def get_asin_inventory_on_inbound_arcs_to_node_by_arrival_time(
 def get_asin_inventory_in_node(node_data, asin):
     return node_data.get('inventory', {}).get(asin, 0)
 
+def get_asin_max_inventory_in_node(node_data, asin):
+    # Default assumption is that nodes have effectively infinite capacity
+    return node_data.get('max_inventory', {}).get(asin, 10e10)
 
 def set_asin_inventory_in_node(node_data, asin, quantity):
     node_data.get('inventory', {})[asin] = quantity
