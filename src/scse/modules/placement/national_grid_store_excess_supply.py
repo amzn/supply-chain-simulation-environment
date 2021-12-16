@@ -75,12 +75,8 @@ class StoreExcessSupply(Agent):
                     if available_capacity == 0:
                         logger.debug(f'Battery {battery} is already full')
                         continue
-                    if available_capacity >= onhand:
-                        transfer_amount = onhand
-                    else:
-                        logger.debug(f'Battery {battery} is going to be filled')
-                        transfer_amount = available_capacity
 
+                    transfer_amount = min(onhand, available_capacity)
                     onhand -= transfer_amount
                     battery_data['incoming'] += transfer_amount
 
