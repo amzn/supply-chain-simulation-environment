@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: cli",
+            "name": "Python: miniscot cli",
             "type": "python",
             "request": "launch",
             "program": "src/scse/main/cli.py",
