@@ -80,6 +80,14 @@ class NationalGridNetwork(Env):
                    max_inventory={ELECTRICITY_ASIN: 100}
                    )
 
+        G.add_node("Battery3",
+                   node_type='warehouse',
+                   location=(-3.0, 54.0),
+                   # inventory = dict.fromkeys(asin_list, self._initial_inventory),
+                   inventory={ELECTRICITY_ASIN: 10},
+                   max_inventory={ELECTRICITY_ASIN: 100}
+                   )
+
         # Consumers
         # Only one for now - more can be added at later date
         G.add_node("Consumers",
@@ -119,6 +127,10 @@ class NationalGridNetwork(Env):
         # Note: At later date may want to model direct source -> battery storage
         G.add_edge("Substation", "Battery",
                    ** {'transit_time': self._transit_time, 'shipments': []})
+        G.add_edge("Substation", "Battery2",
+                   ** {'transit_time': self._transit_time, 'shipments': []})
+        G.add_edge("Substation", "Battery3",
+                   ** {'transit_time': self._transit_time, 'shipments': []})
 
         # Battery to to substation
         # Could use different substation to prevent cycle
@@ -126,8 +138,9 @@ class NationalGridNetwork(Env):
                    ** {'transit_time': self._transit_time, 'shipments': []})
         G.add_edge("Battery2", "Substation",
                    ** {'transit_time': self._transit_time, 'shipments': []})
-        G.add_edge("Substation", "Battery2",
+        G.add_edge("Battery3", "Substation",
                    ** {'transit_time': self._transit_time, 'shipments': []})
+
         # Substation to customer
         G.add_edge("Substation", "Consumers",
                    ** {'transit_time': self._transit_time, 'shipments': []})
