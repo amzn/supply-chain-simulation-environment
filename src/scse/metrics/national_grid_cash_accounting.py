@@ -4,6 +4,9 @@ Rewards for the simulation, cash accounting
 import logging
 from os.path import dirname, join
 import csv
+from scse.constants.national_grid_constants import (
+    DEFAULT_BALANCE_SOURCE, DEFAULT_BALANCE_SINK
+)
 logger = logging.getLogger(__name__)
 
 
@@ -57,25 +60,36 @@ class CashAccounting():
         if actionType == 'outbound_shipment':
             # substations => consumers/sink
 
-            revenue = self._price * quantity
+            # we only care about the case where we interact w/ balance scheme
+            if action['destination'] == DEFAULT_BALANCE_SINK:
+                revenue = self._price * quantity
 
-            # add to timestep aggregate metrics, to be logged later
-            self._timestep_revenue += revenue
-            self._timestep_sales_quantity += quantity
+                # add to timestep aggregate metrics, to be logged later
+                self._timestep_revenue += revenue
+                self._timestep_sales_quantity += quantity
 
-            # TODO: make this NEGATIVE when we give to sink (unused supply = bad!)
-            reward = revenue
+                # negative when we give to sink (unused supply = bad!)
+                reward = -revenue
+            else:
+                # note: could return to positive reward when give to consumers
+                # for now, ignore
+                reward = 0
 
         elif actionType == 'inbound_shipment':
             # substations => vendors/source
 
-            cost = self._cost * quantity
+            # we only care about the case where we interact w/ balance scheme
+            if action['origin'] == DEFAULT_BALANCE_SOURCE:
+                cost = self._cost * quantity
 
-            # add to timestep aggregate metrics, to be logged later
-            self._timestep_vendor_cost += cost
+                # add to timestep aggregate metrics, to be logged later
+                self._timestep_vendor_cost += cost
 
-            # TODO: make this negative (bad) ONLY when we draw from the source
-            reward = -1 * cost
+                # negative (bad) when we draw from the source
+                reward = -1 * cost
+            else:
+                # note: could also penalize when draw from other sources
+                reward = 0
 
         elif actionType == 'transfer':
             # substations => batteries

@@ -128,6 +128,7 @@ class NationalGridNetwork(Env):
                    ** {'transit_time': self._transit_time, 'shipments': []})
         G.add_edge("Substation", "Battery2",
                    ** {'transit_time': self._transit_time, 'shipments': []})
+
         # Substation to customer
         G.add_edge("Substation", "Consumers",
                    ** {'transit_time': self._transit_time, 'shipments': []})

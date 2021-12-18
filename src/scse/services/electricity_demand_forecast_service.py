@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 class ElectricityDemandForecast(Service):
-    _DEFAULT_AMOUNT = 40
+    _DEFAULT_AMOUNT = 80  # 40
 
     def __init__(self, run_parameters):
         """
@@ -22,7 +22,7 @@ class ElectricityDemandForecast(Service):
     def reset(self, context):
         logger.debug("Resetting electricity demand forecast service.")
         pass
-            
+
     def get_forecast(self, time):
         """
         Generate a demand forcast for the given time.
@@ -38,7 +38,8 @@ class ElectricityDemandForecast(Service):
         # Return the default value
         # TODO: Replace with trained models/emulators which use time
         demand_amount = int(
-            (self._amount * int((time.hour*2) + (time.minute/30) + 1)) * PERIOD_LENGTH_HOURS
+            (self._amount * int((time.hour*2) + (time.minute/30) + 1))
+            * PERIOD_LENGTH_HOURS
         )
 
         return demand_amount

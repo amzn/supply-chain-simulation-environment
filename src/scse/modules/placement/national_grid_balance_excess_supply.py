@@ -18,7 +18,7 @@ class BalanceExcessSupply(Agent):
 
     def __init__(self, run_parameters):
         """
-        Dispose of excess supply, via designated sink, to ensure 
+        Dispose of excess supply, via designated sink, to ensure
         the network is not oversupplied.
 
         As with a number of other modules, only the `electricity`
