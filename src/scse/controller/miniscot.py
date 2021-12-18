@@ -29,12 +29,12 @@ class SupplyChainEnvironment:
     #  'run parameters' to be specified directly in the profiles.
     # The trade-off is that profile values are not meant to change (per run).
     def __init__(self,
-                 profile = 'newsvendor_demo_profile',       # defines the set of modules to use
-                 simulation_seed = 12345,   # controls randomness throughout simulation
-                 start_date = '2019-01-01', # simulation start date
-                 time_increment = 'daily',  # timestep increment
-                 time_horizon = 100,        # timestep horizon
-                 asin_selection = 1):       # how many / which asins to simulate
+                 profile='newsvendor_demo_profile',       # defines the set of modules to use
+                 simulation_seed=12345,   # controls randomness throughout simulation
+                 start_date='2019-01-01',  # simulation start date
+                 time_increment='daily',  # timestep increment
+                 time_horizon=100,        # timestep horizon
+                 asin_selection=1):       # how many / which asins to simulate
 
         self._program_start_time = time.time()
         self._miniscot_time_profile = {}
@@ -47,29 +47,30 @@ class SupplyChainEnvironment:
 
         # Invariant: order should not be relevant.
         self._metrics = [instantiate_class(class_name,
-                                           simulation_seed = simulation_seed,
-                                           start_date = start_date,
-                                           time_increment = time_increment,
-                                           time_horizon = time_horizon,
-                                           asin_selection = asin_selection)
+                                           simulation_seed=simulation_seed,
+                                           start_date=start_date,
+                                           time_increment=time_increment,
+                                           time_horizon=time_horizon,
+                                           asin_selection=asin_selection)
                          for class_name in profile_config['metrics']]
 
         # TODO For now, only a single metric module is supported.
         if len(self._metrics) != 1:
-            raise ValueError("miniSCOT supports only a single metric. " +
-                             "{} were specified.".format(len(self._metrics)))
+            raise ValueError("miniSCOT supports only a single metric. "
+                             + "{} were specified.".format(len(self._metrics)))
         self._metrics = self._metrics[0]
 
         self._modules = [instantiate_class(class_name,
-                                           simulation_seed = simulation_seed,
-                                           start_date = start_date,
-                                           time_increment = time_increment,
-                                           time_horizon = time_horizon,
-                                           asin_selection = asin_selection)
+                                           simulation_seed=simulation_seed,
+                                           start_date=start_date,
+                                           time_increment=time_increment,
+                                           time_horizon=time_horizon,
+                                           asin_selection=asin_selection)
                          for class_name in profile_config['modules']]
 
         current_program_time = time.time()
-        self._miniscot_time_profile['miniscot_init'] = current_program_time - self._program_start_time
+        self._miniscot_time_profile['miniscot_init'] = current_program_time - \
+            self._program_start_time
 
     def get_initial_env_values(self):
         module_start_time = time.time()
@@ -80,7 +81,8 @@ class SupplyChainEnvironment:
         start_year = int(self._start_date[0:4])
         start_month = int(self._start_date[5:7])
         start_day = int(self._start_date[-2:])
-        state['date_time'] = datetime.datetime(start_year, start_month, start_day)
+        state['date_time'] = datetime.datetime(
+            start_year, start_month, start_day)
         self.episode_reward = 0
 
         # TODO Should we treat this as context or state?
@@ -119,7 +121,8 @@ class SupplyChainEnvironment:
                     state[module.get_name()] = module_state
 
         module_end_time = time.time()
-        self._miniscot_time_profile['initial_env_values'] = module_end_time - module_start_time
+        self._miniscot_time_profile['initial_env_values'] = module_end_time - \
+            module_start_time
 
         return context, state
 
@@ -139,8 +142,10 @@ class SupplyChainEnvironment:
                     state[module.get_name()] = module_state
 
                 module_end_time = time.time()
-                self._miniscot_time_profile[module.get_name()+" reset"] = module_end_time - module_start_time
-                self._miniscot_time_profile[module.get_name()+" compute_actions"] = 0
+                self._miniscot_time_profile[module.get_name(
+                )+" reset"] = module_end_time - module_start_time
+                self._miniscot_time_profile[module.get_name(
+                )+" compute_actions"] = 0
         self._metrics.reset(context, state)
         logger.debug("trying to reset signed-in services")
         registry.reset_signed_in_services(context)
@@ -149,27 +154,30 @@ class SupplyChainEnvironment:
         self._miniscot_time_profile["miniscot_advance_time"] = 0
         self._miniscot_time_profile["miniscot_metrics_time"] = 0
 
-
     def step(self, state, actions):
         # TODO we should clone the state to make clear that it must NOT be
         # modified by the modules directly. Not sure yet if info should likewise be immutable.
         state = self._transfer_shipments(state)
         timestep_reward = 0
-        timestep_reward_by_asin = {k:0 for k in self._context['asin_list']}
+        timestep_reward_by_asin = {k: 0 for k in self._context['asin_list']}
         for module in self._modules:
             if isinstance(module, Agent):
                 module_start_time = time.time()
-                logger.debug("Getting actions from Agent: {}." .format(module.get_name()))
+                logger.debug(
+                    "Getting actions from Agent: {}." .format(module.get_name()))
                 actions.extend(module.compute_actions(state))
                 module_end_time = time.time()
-                self._miniscot_time_profile[module.get_name()+" compute_actions"] += module_end_time - module_start_time
-                
+                self._miniscot_time_profile[module.get_name(
+                )+" compute_actions"] += module_end_time - module_start_time
+
                 miniscot_execute_actions_start_time = time.time()
                 state, actions, reward = self._execute_actions(actions, state)
                 miniscot_execute_actions_end_time = time.time()
-                self._miniscot_time_profile["miniscot_action_execution"] += miniscot_execute_actions_end_time - miniscot_execute_actions_start_time
+                self._miniscot_time_profile["miniscot_action_execution"] += miniscot_execute_actions_end_time - \
+                    miniscot_execute_actions_start_time
 
-                timestep_reward_by_asin = {k: timestep_reward_by_asin.get(k, 0) + reward['by_asin'].get(k, 0) for k in set(timestep_reward_by_asin)}
+                timestep_reward_by_asin = {k: timestep_reward_by_asin.get(
+                    k, 0) + reward['by_asin'].get(k, 0) for k in set(timestep_reward_by_asin)}
                 timestep_reward += reward['total']
 
         # Invariant: only the following statements below are allowed to update the state.
@@ -180,24 +188,26 @@ class SupplyChainEnvironment:
         miniscot_advance_time_start_time = time.time()
         state, reward = self._advance_time(state)
         miniscot_advance_time_end_time = time.time()
-        self._miniscot_time_profile["miniscot_advance_time"] += miniscot_advance_time_end_time - miniscot_advance_time_start_time
+        self._miniscot_time_profile["miniscot_advance_time"] += miniscot_advance_time_end_time - \
+            miniscot_advance_time_start_time
         if state['clock'] == self._time_horizon:
             program_end_time = time.time()
             total_measured_time = sum(self._miniscot_time_profile.values())
             self._miniscot_time_profile["total_measured_time"] = total_measured_time
-            self._miniscot_time_profile["miniscot_total_time"] = program_end_time - self._program_start_time
+            self._miniscot_time_profile["miniscot_total_time"] = program_end_time - \
+                self._program_start_time
             profile_time = str(self._miniscot_time_profile)
             logger.info("Measured simulation time: {}".format(profile_time))
 
-
         timestep_reward += reward['total']
-        timestep_reward_by_asin = {k: timestep_reward_by_asin.get(k, 0) + reward['by_asin'].get(k, 0) for k in set(timestep_reward_by_asin)}
+        timestep_reward_by_asin = {k: timestep_reward_by_asin.get(
+            k, 0) + reward['by_asin'].get(k, 0) for k in set(timestep_reward_by_asin)}
         self.episode_reward += timestep_reward
-        
+
         logger.info(red("timestep is = " + str(state['clock'])))
         logger.info(red("datetime is = " + str(state['date_time'])))
         logger.info(red("Timestep Reward = " + str(timestep_reward)))
-        logger.info(red("Episode Reward = " +str(self.episode_reward)))
+        logger.info(red("Episode Reward = " + str(self.episode_reward)))
 
         rewards = {}
         rewards["timestep_reward"] = {}
@@ -213,12 +223,14 @@ class SupplyChainEnvironment:
         # Execute all completed actions that are scheduled for this timestep
         unexecuted_actions = []
         reward = 0
-        reward_by_asin = {k:0 for k in self._context['asin_list']}
+        reward_by_asin = {k: 0 for k in self._context['asin_list']}
         for action in actions:
             if action['quantity'] < 0:
-                raise ValueError ("Action quantity is negative, which is not possible!")
+                raise ValueError(
+                    "Action quantity is negative, which is not possible!")
             if isinstance(action['quantity'], int) == False:
-                raise ValueError ("Action quantity is not integer, which is not possible!")
+                raise ValueError(
+                    "Action quantity is not integer, which is not possible!")
             if action['schedule'] <= state['clock']:
                 if action['type'] in ['purchase_order', 'customer_order']:
                     state = self._create_order_entity(state, action)
@@ -228,11 +240,13 @@ class SupplyChainEnvironment:
                     metrics_start_time = time.time()
                     action_reward = self._metrics.compute_reward(state, action)
                     metrics_end_time = time.time()
-                    self._miniscot_time_profile["miniscot_metrics_time"] += metrics_end_time - metrics_start_time
+                    self._miniscot_time_profile["miniscot_metrics_time"] += metrics_end_time - \
+                        metrics_start_time
                     reward += action_reward
                     reward_by_asin[action['asin']] += action_reward
                 else:
-                    raise ValueError("Unknown action type ".format(action['type']))
+                    raise ValueError(
+                        "Unknown action type ".format(action['type']))
             else:
                 unexecuted_actions.append(action)
 
@@ -257,7 +271,8 @@ class SupplyChainEnvironment:
         elif self._time_increment == 'half-hourly':
             state['date_time'] += datetime.timedelta(hours=0.5)
         else:
-            raise ValueError("Unknown time increment arg".format(self._time_increment))
+            raise ValueError(
+                "Unknown time increment arg".format(self._time_increment))
 
         return state, reward
 
@@ -266,7 +281,7 @@ class SupplyChainEnvironment:
         atype_to_state = action['type']+'s'
         # this could be creating a brand new order, or updating an order w/out turning it into a shipment
         # so, if the uuid already exists, we'll remove the old order; otherwise generate new uuid.
-        state, action = self._remove_order_entity(state, action)      
+        state, action = self._remove_order_entity(state, action)
         # either way, append new order to state
         state[atype_to_state].append(action)
         # keep a history of all orders made
@@ -286,11 +301,12 @@ class SupplyChainEnvironment:
         uuid = action['uuid']
 
         G = state['network']
-        
+
         origin_data = G.nodes[origin]
         destination_data = G.nodes[destination]
 
-        logger.debug("Creating shipment at origin {} and destination {}.".format(origin, destination))
+        logger.debug("Creating shipment at origin {} and destination {}.".format(
+            origin, destination))
         edge_data = G.get_edge_data(origin, destination)
 
         # Update only after the other components have been retrieved to avoid
@@ -301,7 +317,8 @@ class SupplyChainEnvironment:
             if quantity <= origin_data['inventory'][asin] or origin_data.get('allow_negative', False):
                 origin_data['inventory'][asin] -= quantity
             else:
-                raise ValueError("Action tried to transfer {} units of {} from {} to {}, but {} only had {} units of inventory for this ASIN!".format(quantity, asin, origin, destination, origin, origin_data['inventory'][asin]))
+                raise ValueError("Action tried to transfer {} units of {} from {} to {}, but {} only had {} units of inventory for this ASIN!".format(
+                    quantity, asin, origin, destination, origin, origin_data['inventory'][asin]))
 
         shipments = edge_data['shipments']
         transit_time = edge_data['transit_time']
@@ -317,7 +334,6 @@ class SupplyChainEnvironment:
         #logger.debug("edges are {}".format(G.edges(data=True)))
         #logger.debug("Creating shipment {}.".format(shipment))
         #logger.debug("Appending to shipments {} for edge_data {}".format(shipments, edge_data))
-
 
         shipments.append(shipment)
 
@@ -342,14 +358,14 @@ class SupplyChainEnvironment:
 
         return state, action
 
-
     def _transfer_shipments(self, state):
         G = state['network']
         logger.debug("edges are {}".format(G.edges(data=True)))
 
         for origin, destination, edge_data in G.edges(data=True):
             shipments = edge_data['shipments']
-            logger.debug('For edge with origin {} and destination {}, edge data is {}'.format(origin, destination, edge_data))
+            logger.debug('For edge with origin {} and destination {}, edge data is {}'.format(
+                origin, destination, edge_data))
 
             # Let's iterate in reverse so that we can remove elements as needed without causing skips
             for shipment in reversed(shipments):
@@ -389,8 +405,9 @@ class SupplyChainEnvironment:
             logger.info(red("timestep is = " + str(t)))
             logger.info(red("datetime is = " + str(state['date_time'])))
             state, actions, reward = self.step(state, actions)
-            logger.info(red("Reward = " + str(reward["timestep_reward"]["total"])))
-            logger.info(red("Episode Reward = " +str(self.episode_reward)))
+            logger.info(
+                red("Reward = " + str(reward["timestep_reward"]["total"])))
+            logger.info(red("Episode Reward = " + str(self.episode_reward)))
 
         logger.info("Simulation Completed.")
 
