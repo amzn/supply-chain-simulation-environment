@@ -14,6 +14,9 @@ from scse.utils.printer import red
 from scse.utils.uuid import short_uuid
 from scse.services.service_registry import singleton as registry
 from scse.profiles.profile import load_profile, instantiate_class
+from scse.constants.national_grid_constants import (
+    ELECTRICITY_ASIN
+)
 
 # TODO Right now, let's log all by setting DEBUG at the root level...
 # Later remove and let it be configured.
@@ -119,6 +122,17 @@ class SupplyChainEnvironment:
                 module_state = module.get_initial_state(context)
                 if module_state:
                     state[module.get_name()] = module_state
+
+        # penalize the use of many batteries
+        # penalty scaled by capacity of battery
+        # TODO: check that this makes sense
+        battery_penalty = 1
+        G = state["network"]
+        for node, node_data in G.nodes(data=True):
+            if "Battery" in node:
+                self.episode_reward += - \
+                    (battery_penalty) * \
+                    node_data["max_inventory"][ELECTRICITY_ASIN]
 
         module_end_time = time.time()
         self._miniscot_time_profile['initial_env_values'] = module_end_time - \

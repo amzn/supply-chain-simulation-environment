@@ -20,12 +20,14 @@ class BatteryDrawdown(Agent):
         timestep and attempts to draw from battery reserves to compensate.
         This should only fail if there is not sufficient reserve.
 
-        Electricity is sent during the current timestep to maintain balance at 
+        Electricity is sent during the current timestep to maintain balance at
         the substation in the next timestep.
         """
         self._asin = self._DEFAULT_ASIN
-        self._demand_forecast_service = registry.load_service('electricity_demand_forecast_service', run_parameters)
-        self._supply_forecast_service = registry.load_service('electricity_supply_forecast_service', run_parameters)
+        self._demand_forecast_service = registry.load_service(
+            'electricity_demand_forecast_service', run_parameters)
+        self._supply_forecast_service = registry.load_service(
+            'electricity_supply_forecast_service', run_parameters)
 
     def get_name(self):
         return 'battery_drawdown'
@@ -41,8 +43,9 @@ class BatteryDrawdown(Agent):
         actions = []
         current_clock = state['clock']
         current_time = state['date_time']
-        next_time = current_time + datetime.timedelta(hours=PERIOD_LENGTH_HOURS)
-        
+        next_time = current_time + \
+            datetime.timedelta(hours=PERIOD_LENGTH_HOURS)
+
         G = state['network']
 
         # Get a list of substations - remember that these have the type `port` for now
@@ -51,20 +54,24 @@ class BatteryDrawdown(Agent):
         for node, node_data in G.nodes(data=True):
             if node_data.get('node_type') in ['port']:
                 # Would want to pass the node as an argument to the service, in due time
-                future_demand = self._demand_forecast_service.get_forecast(time=next_time)
+                future_demand = self._demand_forecast_service.get_forecast(
+                    time=next_time)
 
                 # Current capacity should be zero most of the time.
                 # Deviations will occur when battery capacity falls to zero.
                 current_holding = node_data['inventory'][self._asin]
 
                 # Find all the inbound supply that's on its way
-                inbound_supply = get_asin_inventory_on_inbound_arcs_to_node(G, self._asin, node)
+                inbound_supply = get_asin_inventory_on_inbound_arcs_to_node(
+                    G, self._asin, node)
 
                 # Calculate the actual deficit in the next timestep
-                substations[node] = future_demand - inbound_supply - current_holding
+                substations[node] = future_demand - \
+                    inbound_supply - current_holding
 
         total_future_deficit = sum(list(substations.values()))
-        logger.debug(f'Total supply deficit in the next timestep: {total_future_deficit}')
+        logger.debug(
+            f'Total supply deficit in the next timestep: {total_future_deficit}')
 
         # If the future supply exceeds demand then nothing needs to be done
         if total_future_deficit < 0:
@@ -77,11 +84,14 @@ class BatteryDrawdown(Agent):
         batteries = {}
         for node, node_data in G.nodes(data=True):
             if node_data.get('node_type') in ['warehouse']:
-                inbound_excess = get_asin_inventory_on_inbound_arcs_to_node(G, self._asin, node)
-                batteries[node] = node_data['inventory'][self._asin] + inbound_excess
+                inbound_excess = get_asin_inventory_on_inbound_arcs_to_node(
+                    G, self._asin, node)
+                batteries[node] = node_data['inventory'][self._asin] + \
+                    inbound_excess
 
         available_stored_electricity = sum(list(batteries.values()))
-        logger.debug(f'Capacity currently held in network batteries: {available_stored_electricity}')
+        logger.debug(
+            f'Capacity currently held in network batteries: {available_stored_electricity}')
 
         # If all the batteries are empty, nothing can be done
         if available_stored_electricity == 0:
@@ -91,7 +101,8 @@ class BatteryDrawdown(Agent):
         # If the future deficit exceeds the available stored electricity then raise warning
         # Batteries will be depleted to meet as much of the shortfall as possible
         if total_future_deficit > available_stored_electricity:
-            logger.debug(f'Not enough stored capacity to meet supply shortfall in the next timestep - batteries will be depleted')
+            logger.debug(
+                f'Not enough stored capacity to meet supply shortfall in the next timestep - batteries will be depleted')
 
         # Perform transfers to drawdown from batteries. Note the requirement to keep track
         # of battery capacities as they're being drawn down.
@@ -101,7 +112,7 @@ class BatteryDrawdown(Agent):
         for substation in list(substations.keys()):
             # Starting deficit figure
             future_deficit = substations[substation]
-            
+
             for battery in list(batteries.keys()):
                 # Initial available capacity
                 battery_capacity = batteries[battery]
@@ -136,14 +147,15 @@ class BatteryDrawdown(Agent):
                 # If the substation's deficit has now bene met then break
                 if future_deficit == 0:
                     del substations[substation]
-                    logger.debug(f"Met supply deficit at substation {substation} in next timestep.")
+                    logger.debug(
+                        f"Met supply deficit at substation {substation} in next timestep.")
                     break
 
             # If all batteries have been depleted than break out of loop
             if len(batteries) == 0:
                 logger.debug("All batteries have been depleted.")
                 break
-        
+
         # Report on any future deficit still remaining
         for substation, remaining_deficit in substations.items():
             logger.debug(
