@@ -4,6 +4,9 @@ Rewards for the simulation, cash accounting
 import logging
 from os.path import dirname, join
 import csv
+from scse.constants.national_grid_constants import (
+    DEFAULT_BALANCE_SOURCE, DEFAULT_BALANCE_SINK
+)
 logger = logging.getLogger(__name__)
 
 
@@ -11,32 +14,38 @@ class CashAccounting():
     def __init__(self, run_parameters):
         self._time_horizon = run_parameters['time_horizon']
         # Hardcoding vendor cost, customer price, holding cost, and lost demand penalty
+
+        # TODO: play with different weights on the penalties!
+
         self._cost = 5
         self._price = 10
-        self._transfer_cost = 2
-        self._holding_cost = 0.5
+        self._transfer_cost = 0  # 2 # cost to move from the batteries
+
         self._lost_demand_penalty = 0
+
+        # how much to reward/penalize battery use
+        self._holding_cost = 0  # 0.5
 
     def reset(self, context, state):
         self._context = {}
         self._context['asin_list'] = context['asin_list']
-        
+
         self._timestep_revenue = 0
         self._timestep_vendor_cost = 0
         self._timestep_holding_cost = 0
         self._timestep_transfer_cost = 0
         self._timestep_sales_quantity = 0
-        
+
         # We'll use this to track unfilled demand, since this builds up
         self._cumulative_customer_orders = []
         # We'll print a csv log, with structure:
         self._log_header = [
-            "timestep", 
-            "revenue", 
+            "timestep",
+            "revenue",
             "vendor_cost",
-            "transfer_cost",  
+            "transfer_cost",
             "holding_cost",
-            "customer_demand_quantity", 
+            "customer_demand_quantity",
             "sales_quantity",
             "unfilled_demand"
         ]
@@ -49,27 +58,44 @@ class CashAccounting():
         asin = action['asin']
 
         if actionType == 'outbound_shipment':
+            # substations => consumers/sink
 
-            revenue = self._price * quantity
+            # we only care about the case where we interact w/ balance scheme
+            if action['destination'] == DEFAULT_BALANCE_SINK:
+                revenue = self._price * quantity
 
-            # add to timestep aggregate metrics, to be logged later
-            self._timestep_revenue += revenue
-            self._timestep_sales_quantity += quantity
+                # add to timestep aggregate metrics, to be logged later
+                self._timestep_revenue += revenue
+                self._timestep_sales_quantity += quantity
 
-            reward = revenue
+                # negative when we give to sink (unused supply = bad!)
+                reward = -revenue
+            else:
+                # note: could return to positive reward when give to consumers
+                # for now, ignore
+                reward = 0
 
         elif actionType == 'inbound_shipment':
-            
-            cost = self._cost * quantity
+            # substations => vendors/source
 
-            # add to timestep aggregate metrics, to be logged later
-            self._timestep_vendor_cost += cost
+            # we only care about the case where we interact w/ balance scheme
+            if action['origin'] == DEFAULT_BALANCE_SOURCE:
+                cost = self._cost * quantity
 
-            reward = -1 * cost
+                # add to timestep aggregate metrics, to be logged later
+                self._timestep_vendor_cost += cost
+
+                # negative (bad) when we draw from the source
+                reward = -1 * cost
+            else:
+                # note: could also penalize when draw from other sources
+                reward = 0
 
         elif actionType == 'transfer':
+            # substations => batteries
 
-            cost = self._transfer_cost* quantity
+            # modulate by changing _transfer_cost in init()
+            cost = self._transfer_cost * quantity
 
             self._timestep_transfer_cost += cost
 
@@ -82,6 +108,8 @@ class CashAccounting():
             timestep_inventory_by_asin_fc = {}
             total_holding_cost = 0
             G = state['network']
+
+            # accounts for cost w/ keeping energy in the batteries
             for node, node_data in G.nodes(data=True):
                 if node_data['node_type'] == 'warehouse':
                     for asin in G.nodes[node]['inventory']:
@@ -92,8 +120,7 @@ class CashAccounting():
 
             self._timestep_holding_cost += total_holding_cost
 
-            # aggregating and outputting the metrics logging
-
+            # NOTE: we care about when the source > 0 (unfilled demand)
             timestep_unfilled_demand = 0
 
             for order in state['customer_orders']:
@@ -105,7 +132,8 @@ class CashAccounting():
                     lost_demand_penalty = self._lost_demand_penalty
 
                     reward['total'] -= lost_demand_penalty*quantity
-                    reward_by_asin[order['asin']] -= lost_demand_penalty*quantity
+                    reward_by_asin[order['asin']
+                                   ] -= lost_demand_penalty*quantity
 
             timestep_log = [
                 str(state['clock']), self._timestep_revenue,
@@ -121,7 +149,6 @@ class CashAccounting():
             self._timestep_transfer_cost = 0
             self._timestep_holding_cost = 0
             self._timestep_sales_quantity = 0
-            
 
             # If we're at the end of the episode, print the csv log
             if state['clock'] == (self._time_horizon - 1):
