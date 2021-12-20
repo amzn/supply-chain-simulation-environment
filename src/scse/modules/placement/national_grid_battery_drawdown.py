@@ -84,8 +84,12 @@ class BatteryDrawdown(Agent):
         batteries = {}
         for node, node_data in G.nodes(data=True):
             if node_data.get('node_type') in ['warehouse']:
-                inbound_excess = get_asin_inventory_on_inbound_arcs_to_node(
-                    G, self._asin, node)
+                # TODO: miniSCOT does not support inclusion of inbound inventory as this
+                # can result in negative inventory at node in the current timestep.
+                # inbound_excess = get_asin_inventory_on_inbound_arcs_to_node(
+                #     G, self._asin, node)
+                inbound_excess = 0
+
                 batteries[node] = node_data['inventory'][self._asin] + \
                     inbound_excess
 

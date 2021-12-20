@@ -141,7 +141,7 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
             ax.coastlines()
 
             # Limit axes to the UK
-            ax.set_extent([-8., 2., 49., 60.])
+            ax.set_extent([-8., 3., 49., 60.])
         else:
             fig, ax = plt.subplots(1, 1, figsize=(10,10))
 
@@ -212,9 +212,9 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
 
             # If there is flow in both directions then indicate this using x/y label; else only label with single quantity
             # There will be no label if there is no flow in either direction
-            if v != 0 and bidirectional_edges[(edge_end, edge_start)] != 0:
+            if v != 0 and bidirectional_edges[(edge_end, edge_start)] > v:
                 nx.draw_networkx_edge_labels(G, pos=pos, ax=ax, edge_labels={k: f'{v}/{bidirectional_edges[(edge_end, edge_start)]}'}, bbox={'alpha': 0})
-            elif v != 0:
+            elif v != 0 and bidirectional_edges[(edge_end, edge_start)] == 0:
                 nx.draw_networkx_edge_labels(G, pos=pos, ax=ax, edge_labels={k: v}, bbox={'alpha': 0})
 
         # Add title showing current clock and time values

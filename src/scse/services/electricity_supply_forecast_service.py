@@ -1,4 +1,8 @@
+import os
 import logging
+
+import numpy as np
+import GPy
 
 from scse.api.module import Service
 from scse.constants.national_grid_constants import (
@@ -9,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class ElectricitySupplyForecast(Service):
-    _DEFAULT_AMOUNT = 45
+    _DEFAULT_BMRS_SOURCE = 'FUELHH'
 
     def __init__(self, run_parameters):
         """
@@ -17,7 +21,7 @@ class ElectricitySupplyForecast(Service):
         """
         logger.debug("Initializing electricity supply forecast service.")
         self._asin_list = None
-        self._amount = self._DEFAULT_AMOUNT
+        self._bmrs_source = self._DEFAULT_BMRS_SOURCE
 
     def get_name(self):
         return "electricity_supply_forecast_service"
@@ -41,14 +45,34 @@ class ElectricitySupplyForecast(Service):
         are passed.
         """
 
-        if asin == ENERGY_GENERATION_ASINS.solar:
-            if time.hour <= 8 or time.hour >= 18:
-                return 0
-            else:
-                return int(self._amount * PERIOD_LENGTH_HOURS)
-        elif asin == ENERGY_GENERATION_ASINS.wind_onshore:
-            return int(self._amount * 2 * PERIOD_LENGTH_HOURS)
-        elif asin == ENERGY_GENERATION_ASINS.fossil_gas:
-            return int(self._amount * 3 * PERIOD_LENGTH_HOURS)
-        else:
-            raise ValueError(f"Electricity supply forecast query failed: {asin} not recognised.")
+        # Determine which period of the day is being considered
+        # Date information is not yet being used
+        period_of_day = int((time.hour*2) + (time.minute/30))
+
+        # Determine the path to the model pickle based on the ASIN
+        file_dir = (os.path.dirname(os.path.realpath(__file__)))
+        model_dir = os.path.join(file_dir, "bmrs_models")
+        gpy_model_pkl = os.path.join(
+            model_dir,
+            f"supply_{self._bmrs_source}_{asin.lower().replace(' ', '_')}.pkl"
+        )
+
+        # Check that the model pickle does exist
+        if not os.path.isfile(gpy_model_pkl):
+            raise FileNotFoundError(
+                f"Could not find supply model for: {asin}."
+            )
+
+        # Load the model pickle
+        m = GPy.load(gpy_model_pkl)
+
+        # Use the model to predict supply from the ASIN
+        mw_prediction, _ = m.predict(np.array([period_of_day])[:, None])
+        mw_prediction = mw_prediction[0][0]
+
+        # Convert the MW prediction to MWhs
+        mwh_prediction = int(np.floor(mw_prediction * PERIOD_LENGTH_HOURS))
+
+        # Not impossible to obtain negative predictions
+        # Return 0 if the prediction is negative
+        return max(mwh_prediction, 0)
