@@ -87,6 +87,7 @@ setup(
         'requests == 2.26.0',
         'gym == 0.21.0',
         'matplotlib==3.5.1',
+        'GPy==1.10.0',
     ],
     setup_requires=[
         'pytest-runner',
