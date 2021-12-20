@@ -1,5 +1,3 @@
-Link to our repo: https://github.com/Cam-MLPW-MLMI-21-22/supply-chain-simulation-environment
-
 # miniSCOT
 
 miniSCOT is a simulation tool that lets users play with the supply chain
