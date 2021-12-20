@@ -1,5 +1,6 @@
 import os
 import logging
+import datetime
 
 import numpy as np
 import GPy
@@ -66,9 +67,20 @@ class ElectricitySupplyForecast(Service):
         # Load the model pickle
         m = GPy.load(gpy_model_pkl)
 
+        # Set random seed based on the timestamp passed.
+        # This ensures predictions are deterministic given the
+        # ASIN and timestamp passed.
+        ref_date = datetime.date(year=2015, month=1, day=1)
+        seed = ((time.date() - ref_date).days * 48) + period_of_day
+        np.random.seed(seed)
+
         # Use the model to predict supply from the ASIN
-        mw_prediction, _ = m.predict(np.array([period_of_day])[:, None])
-        mw_prediction = mw_prediction[0][0]
+        mw_mean, mw_var = m.predict(np.array([period_of_day])[:, None])
+        mw_prediction = np.random.normal(
+            loc=mw_mean[0][0],
+            scale=np.sqrt(mw_var[0][0]),
+            size=1
+        )[0]
 
         # Convert the MW prediction to MWhs
         mwh_prediction = int(np.floor(mw_prediction * PERIOD_LENGTH_HOURS))
