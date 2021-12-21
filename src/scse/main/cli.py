@@ -1,4 +1,6 @@
 from __future__ import print_function
+import logging
+import os
 import sys
 import importlib
 import argparse
@@ -79,6 +81,8 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
         
         If `visual=True` then call `do_visualise` on each step. Press q to iterate through steps.
         """
+        os.environ['num_batteries'] = arguments.arg_list[0]
+
         if visual:
             self.do_visualise(None)
         for t in range(self._state['clock'], self._horizon):

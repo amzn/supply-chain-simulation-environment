@@ -1,3 +1,4 @@
+import os
 import networkx as nx
 
 from scse.api.module import Env
@@ -34,8 +35,12 @@ class NationalGridNetwork(Env):
         self._init_battery_capacity = run_parameters.get(
             'init_battery_capacity', self._DEFAULT_INIT_BATTERY_CAPACITY)
 
-        self._num_batteries = run_parameters.get(
-            'num_batteries', self._DEFAULT_NUM_BATTERIES)
+        if os.environ.get('num_batteries') is not None:
+            self._num_batteries = run_parameters.get(
+                'num_batteries', os.environ.get('num_batteries'))
+        else:
+            self._num_batteries = run_parameters.get(
+                'num_batteries', self._DEFAULT_NUM_BATTERIES)
 
     def get_name(self):
         return 'network'
