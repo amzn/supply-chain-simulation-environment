@@ -32,7 +32,7 @@ class SupplyChainEnvironment:
     #  'run parameters' to be specified directly in the profiles.
     # The trade-off is that profile values are not meant to change (per run).
     def __init__(self,
-                 profile='newsvendor_demo_profile',       # defines the set of modules to use
+                 profile='national_grid_profile.json',       # defines the set of modules to use
                  simulation_seed=12345,   # controls randomness throughout simulation
                  start_date='2019-01-01',  # simulation start date
                  time_increment='daily',  # timestep increment
