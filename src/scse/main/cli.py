@@ -13,10 +13,11 @@ from scse.controller import miniscot as miniSCOT
 class MiniSCOTDebuggerApp(cmd2.Cmd):
     _DEFAULT_START_DATE = '2019-01-01'
     _DEFAULT_TIME_INCREMENT = 'half-hourly'
-    _DEFAULT_HORIZON = 100
+    _DEFAULT_HORIZON = 5
     _DEFAULT_SIMULATION_SEED = 12345
     _DEFAULT_ASIN_SELECTION = 0 # or use an integer value to select the number of asins
     _DEFAULT_PROFILE = 'national_grid_profile'
+    _DEFAULT_NUM_BATTERIES = 10
 
     def __init__(self, **args):
         super().__init__(args)
@@ -28,7 +29,8 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
                     time_increment = self._DEFAULT_TIME_INCREMENT,
                     time_horizon = self._DEFAULT_HORIZON,
                     asin_selection = self._DEFAULT_ASIN_SELECTION,
-                    profile = self._DEFAULT_PROFILE)
+                    profile = self._DEFAULT_PROFILE,
+                    num_batteries=self._DEFAULT_NUM_BATTERIES)
 
         self._set_prompt()
 
@@ -51,12 +53,13 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
         self._env.reset_agents(self._context, self._state)
 
     param_parser = argparse.ArgumentParser()
-    param_parser.add_argument('-start_date', help="simulation will at date 'yyyy-mm-dd' (default 2019-01-01)", type=str, default=_DEFAULT_START_DATE)
-    param_parser.add_argument('-time_increment', help="increment time daily or hourly (default 'daily')", type=str, default=_DEFAULT_TIME_INCREMENT)
-    param_parser.add_argument('-horizon', help="total time units to simulate (default 100)", type=int, default=_DEFAULT_HORIZON)
-    param_parser.add_argument('-seed', help="simulation random seed (default 12345)", type=int, default=_DEFAULT_SIMULATION_SEED)
-    param_parser.add_argument('-asin_selection', help="number of ASINs to use (default 10)", type=int, default=_DEFAULT_ASIN_SELECTION)
-    param_parser.add_argument('-profile', help="profile (default minimal)", type=str, default=_DEFAULT_PROFILE)
+    param_parser.add_argument('--start_date', help="simulation will at date 'yyyy-mm-dd' (default 2019-01-01)", type=str, default=_DEFAULT_START_DATE)
+    param_parser.add_argument('--time_increment', help="increment time daily or hourly (default 'daily')", type=str, default=_DEFAULT_TIME_INCREMENT)
+    param_parser.add_argument('--horizon', help="total time units to simulate (default 100)", type=int, default=_DEFAULT_HORIZON)
+    param_parser.add_argument('--seed', help="simulation random seed (default 12345)", type=int, default=_DEFAULT_SIMULATION_SEED)
+    param_parser.add_argument('--asin_selection', help="number of ASINs to use (default 10)", type=int, default=_DEFAULT_ASIN_SELECTION)
+    param_parser.add_argument('--profile', help="profile (default minimal)", type=str, default=_DEFAULT_PROFILE)
+    param_parser.add_argument('--num_batteries', help="number of batteries (default 10)", type=int, default=_DEFAULT_NUM_BATTERIES)
     #param_parser.add_argument('-asin', help="list of ASINs.", action='append', default=_DEFAULT_ASIN_LIST)
 
     @cmd2.with_argparser(param_parser)
@@ -67,7 +70,8 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
                     time_increment = args.time_increment,
                     time_horizon = args.horizon,
                     asin_selection = args.asin_selection,
-                    profile = args.profile)
+                    profile = args.profile,
+                    num_batteries= args.num_batteries)
 
     def do_next(self, arguments):
         """Execute a single time unit."""
