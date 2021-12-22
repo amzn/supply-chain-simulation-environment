@@ -8,18 +8,21 @@ class miniSCOTnotebook():
     DEFAULT_ASIN_SELECTION = 0
     DEFAULT_PROFILE = 'national_grid_profile'
     DEFAULT_NUM_BATTERIES = 10
+    DEFAULT_MAX_BATTERY_CAPACITY = 50
 
     def __init__(self, simulation_seed=DEFAULT_SIMULATION_SEED,
                  start_date=DEFAULT_START_DATE,
                  time_increment=DEFAULT_TIME_INCREMENT,
                  time_horizon=DEFAULT_HORIZON,
-                 num_batteries=DEFAULT_NUM_BATTERIES):
+                 num_batteries=DEFAULT_NUM_BATTERIES,
+                 max_battery_capacity=DEFAULT_MAX_BATTERY_CAPACITY):
 
         self.simulation_seed = simulation_seed
         self.start_date = start_date
         self.time_increment = time_increment
         self.time_horizon = time_horizon
         self.num_batteries = num_batteries
+        self.max_battery_capacity = max_battery_capacity
 
         self.start(simulation_seed=self.simulation_seed,
                    start_date=self.start_date,
@@ -27,7 +30,8 @@ class miniSCOTnotebook():
                    time_horizon=self.time_horizon,
                    num_batteries=self.num_batteries,
                    asin_selection=self.DEFAULT_ASIN_SELECTION,
-                   profile=self.DEFAULT_PROFILE)
+                   profile=self.DEFAULT_PROFILE,
+                   max_battery_capacity=self.max_battery_capacity)
 
         # The cumulative reward at each time step i.e. the episode reward for each time-step
         self.cum_reward = []

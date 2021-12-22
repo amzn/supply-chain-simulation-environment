@@ -18,6 +18,7 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
     _DEFAULT_ASIN_SELECTION = 0 # or use an integer value to select the number of asins
     _DEFAULT_PROFILE = 'national_grid_profile'
     _DEFAULT_NUM_BATTERIES = 10
+    _DEFAULT_MAX_BATTERY_CAPACITY = 50
 
     def __init__(self, **args):
         super().__init__(args)
@@ -32,7 +33,8 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
                     time_horizon = self._DEFAULT_HORIZON,
                     asin_selection = self._DEFAULT_ASIN_SELECTION,
                     profile = self._DEFAULT_PROFILE,
-                    num_batteries=self._DEFAULT_NUM_BATTERIES)
+                    num_batteries=self._DEFAULT_NUM_BATTERIES,
+                    max_battery_capacity=self._DEFAULT_MAX_BATTERY_CAPACITY)
 
         self._set_prompt()
 
@@ -56,6 +58,7 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
         self._env.reset_agents(self._context, self._state)
 
     param_parser = argparse.ArgumentParser()
+    param_parser.add_argument('--max_battery_capacity', help="max battery capacity (default 50)", type=int, default=_DEFAULT_MAX_BATTERY_CAPACITY)
     param_parser.add_argument('--start_date', help="simulation will at date 'yyyy-mm-dd' (default 2019-01-01)", type=str, default=_DEFAULT_START_DATE)
     param_parser.add_argument('--time_increment', help="increment time daily or hourly (default 'daily')", type=str, default=_DEFAULT_TIME_INCREMENT)
     param_parser.add_argument('--horizon', help="total time units to simulate (default 100)", type=int, default=_DEFAULT_HORIZON)
@@ -74,7 +77,8 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
                     time_horizon = args.horizon,
                     asin_selection = args.asin_selection,
                     profile = args.profile,
-                    num_batteries= args.num_batteries)
+                    num_batteries = args.num_batteries,
+                    max_battery_capacity = args.max_battery_capacity)
 
     def do_next(self, arguments):
         """Execute a single time unit."""

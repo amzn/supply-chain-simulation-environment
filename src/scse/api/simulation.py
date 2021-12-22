@@ -7,6 +7,7 @@ DEFAULT_TIME_INCREMENT = 'half-hourly'
 DEFAULT_HORIZON = 5
 DEFAULT_SIMULATION_SEED = 12345
 DEFAULT_NUM_BATTERIES = 1
+DEFAULT_MAX_BATTERY_CAPACITY = 50
 
 
 def run_simulation(logging_level=DEFAULT_LOGGING_LEVEL,
@@ -14,7 +15,8 @@ def run_simulation(logging_level=DEFAULT_LOGGING_LEVEL,
                    start_date=DEFAULT_START_DATE,
                    time_increment=DEFAULT_TIME_INCREMENT,
                    time_horizon=DEFAULT_HORIZON,
-                   num_batteries=DEFAULT_NUM_BATTERIES):
+                   num_batteries=DEFAULT_NUM_BATTERIES,
+                   max_battery_capacity=DEFAULT_MAX_BATTERY_CAPACITY):
 
     logger = logging.getLogger()
     if logging_level == 'DEBUG':
@@ -22,11 +24,11 @@ def run_simulation(logging_level=DEFAULT_LOGGING_LEVEL,
     else:
         logger.setLevel(logging.CRITICAL)
 
-    m = miniSCOTnotebook(simulation_seed, start_date, time_increment, time_horizon, num_batteries)
+    m = miniSCOTnotebook(simulation_seed, start_date, time_increment, time_horizon, num_batteries, max_battery_capacity)
     cum_reward = m.run()
 
     return cum_reward
 
 
 if __name__ == '__main__':
-    run_simulation()
+    print(run_simulation())

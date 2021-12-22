@@ -38,7 +38,8 @@ class SupplyChainEnvironment:
                  time_increment='daily',  # timestep increment
                  time_horizon=100,        # timestep horizon
                  asin_selection=1,
-                 num_batteries=10):       # how many / which asins to simulate
+                 num_batteries=10,
+                 max_battery_capacity=50):       # how many / which asins to simulate
 
         self._program_start_time = time.time()
         self._miniscot_time_profile = {}
@@ -56,7 +57,8 @@ class SupplyChainEnvironment:
                                            time_increment=time_increment,
                                            time_horizon=time_horizon,
                                            asin_selection=asin_selection,
-                                           num_batteries=num_batteries)
+                                           num_batteries=num_batteries,
+                                           max_battery_capacity=max_battery_capacity)
                          for class_name in profile_config['metrics']]
 
         # TODO For now, only a single metric module is supported.
@@ -71,7 +73,8 @@ class SupplyChainEnvironment:
                                            time_increment=time_increment,
                                            time_horizon=time_horizon,
                                            asin_selection=asin_selection,
-                                           num_batteries=num_batteries)
+                                           num_batteries=num_batteries,
+                                           max_battery_capacity=max_battery_capacity)
                          for class_name in profile_config['modules']]
 
         current_program_time = time.time()
