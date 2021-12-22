@@ -9,17 +9,25 @@ class miniSCOTnotebook():
     DEFAULT_PROFILE = 'national_grid_profile'
     DEFAULT_NUM_BATTERIES = 10
 
-    def __init__(self, time_horizon=DEFAULT_HORIZON, num_batteries=DEFAULT_NUM_BATTERIES):
+    def __init__(self, simulation_seed=DEFAULT_SIMULATION_SEED,
+                 start_date=DEFAULT_START_DATE,
+                 time_increment=DEFAULT_TIME_INCREMENT,
+                 time_horizon=DEFAULT_HORIZON,
+                 num_batteries=DEFAULT_NUM_BATTERIES):
+
+        self.simulation_seed = simulation_seed
+        self.start_date = start_date
+        self.time_increment = time_increment
         self.time_horizon = time_horizon
         self.num_batteries = num_batteries
 
-        self.start(simulation_seed=self.DEFAULT_SIMULATION_SEED,
-                   start_date=self.DEFAULT_START_DATE,
-                   time_increment=self.DEFAULT_TIME_INCREMENT,
+        self.start(simulation_seed=self.simulation_seed,
+                   start_date=self.start_date,
+                   time_increment=self.time_increment,
                    time_horizon=self.time_horizon,
+                   num_batteries=self.num_batteries,
                    asin_selection=self.DEFAULT_ASIN_SELECTION,
-                   profile=self.DEFAULT_PROFILE,
-                   num_batteries=self.num_batteries)
+                   profile=self.DEFAULT_PROFILE)
 
     def start(self, **run_parameters):
         self.horizon = run_parameters['time_horizon']
@@ -42,6 +50,8 @@ class miniSCOTnotebook():
                 break
             else:
                 self.state, self.actions, self.reward = self.env.step(self.state, self.actions)
+
+        return self.reward
 
 
 m = miniSCOTnotebook()

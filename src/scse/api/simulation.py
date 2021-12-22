@@ -1,9 +1,13 @@
 from scse.main.notebook_interface import miniSCOTnotebook
 
-def main():
-    m = miniSCOTnotebook(10, 1)
-    m.run()
+def run_simulation():
+    m = miniSCOTnotebook(999, '2019-01-02', 'daily', 5, 5)
+    rewards = m.run()
+    episode_reward = rewards.get('episode_reward').get('total')
+
+    return episode_reward
 
 
 if __name__ == "__main__":
-    main()
+    print(run_simulation())
+

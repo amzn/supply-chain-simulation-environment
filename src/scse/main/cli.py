@@ -22,6 +22,8 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
     def __init__(self, **args):
         super().__init__(args)
         print("Welcome to miniSCOT - your Supply Chain in a bottle.")
+        print("IMPORTANT: If you want to supply arguments you need to run 'start' along with the desired arguments"
+              "to initialize the environment correctly. Then run 'run'.")
         # self.intro = self.colorize("Welcome to miniSCOT - your Supply Chain in a bottle.", 'cyan')
 
         self._start(simulation_seed = self._DEFAULT_SIMULATION_SEED,
