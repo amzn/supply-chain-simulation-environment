@@ -79,6 +79,7 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
         
         If `visual=True` then call `do_visualise` on each step. Press q to iterate through steps.
         """
+
         if visual:
             self.do_visualise(None)
         for t in range(self._state['clock'], self._horizon):
