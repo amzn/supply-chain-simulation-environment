@@ -32,12 +32,13 @@ class SupplyChainEnvironment:
     #  'run parameters' to be specified directly in the profiles.
     # The trade-off is that profile values are not meant to change (per run).
     def __init__(self,
-                 profile='newsvendor_demo_profile',       # defines the set of modules to use
+                 profile='national_grid_profile.json',       # defines the set of modules to use
                  simulation_seed=12345,   # controls randomness throughout simulation
                  start_date='2019-01-01',  # simulation start date
                  time_increment='daily',  # timestep increment
                  time_horizon=100,        # timestep horizon
-                 asin_selection=1):       # how many / which asins to simulate
+                 asin_selection=1,
+                 num_batteries=10):       # how many / which asins to simulate
 
         self._program_start_time = time.time()
         self._miniscot_time_profile = {}
@@ -54,7 +55,8 @@ class SupplyChainEnvironment:
                                            start_date=start_date,
                                            time_increment=time_increment,
                                            time_horizon=time_horizon,
-                                           asin_selection=asin_selection)
+                                           asin_selection=asin_selection,
+                                           num_batteries=num_batteries)
                          for class_name in profile_config['metrics']]
 
         # TODO For now, only a single metric module is supported.
@@ -68,7 +70,8 @@ class SupplyChainEnvironment:
                                            start_date=start_date,
                                            time_increment=time_increment,
                                            time_horizon=time_horizon,
-                                           asin_selection=asin_selection)
+                                           asin_selection=asin_selection,
+                                           num_batteries=num_batteries)
                          for class_name in profile_config['modules']]
 
         current_program_time = time.time()

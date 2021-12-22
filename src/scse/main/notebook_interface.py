@@ -1,21 +1,25 @@
 from scse.controller import miniscot as miniSCOT
 
-
 class miniSCOTnotebook():
     DEFAULT_START_DATE = '2019-01-01'
-    DEFAULT_TIME_INCREMENT = 'daily'
+    DEFAULT_TIME_INCREMENT = 'half-hourly'
     DEFAULT_HORIZON = 100
     DEFAULT_SIMULATION_SEED = 12345
-    DEFAULT_ASIN_SELECTION = 1
-    DEFAULT_PROFILE = 'newsvendor_demo_profile'
+    DEFAULT_ASIN_SELECTION = 0
+    DEFAULT_PROFILE = 'national_grid_profile'
+    DEFAULT_NUM_BATTERIES = 10
 
-    def __init__(self):
+    def __init__(self, time_horizon=DEFAULT_HORIZON, num_batteries=DEFAULT_NUM_BATTERIES):
+        self.time_horizon = time_horizon
+        self.num_batteries = num_batteries
+
         self.start(simulation_seed=self.DEFAULT_SIMULATION_SEED,
                    start_date=self.DEFAULT_START_DATE,
                    time_increment=self.DEFAULT_TIME_INCREMENT,
-                   time_horizon=self.DEFAULT_HORIZON,
+                   time_horizon=self.time_horizon,
                    asin_selection=self.DEFAULT_ASIN_SELECTION,
-                   profile=self.DEFAULT_PROFILE)
+                   profile=self.DEFAULT_PROFILE,
+                   num_batteries=self.num_batteries)
 
     def start(self, **run_parameters):
         self.horizon = run_parameters['time_horizon']

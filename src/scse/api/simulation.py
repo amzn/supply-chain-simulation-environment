@@ -1,7 +1,7 @@
 from scse.main.notebook_interface import miniSCOTnotebook
 
 def main():
-    m = miniSCOTnotebook(10, 20)
+    m = miniSCOTnotebook(10, 1)
     m.run()
 
 
