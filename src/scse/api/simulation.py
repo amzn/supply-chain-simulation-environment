@@ -4,7 +4,7 @@ import logging
 DEFAULT_LOGGING_LEVEL = 'CRITICAL'
 DEFAULT_START_DATE = '2019-01-01'
 DEFAULT_TIME_INCREMENT = 'half-hourly'
-DEFAULT_HORIZON = 5
+DEFAULT_HORIZON = 100
 DEFAULT_SIMULATION_SEED = 12345
 DEFAULT_NUM_BATTERIES = 1
 DEFAULT_MAX_BATTERY_CAPACITY = 50
@@ -29,6 +29,7 @@ def run_simulation(logging_level=DEFAULT_LOGGING_LEVEL,
 
     return cum_reward
 
-
+# Leaving this here to make testing run_simulation easy
 if __name__ == '__main__':
-    print(run_simulation())
+    # Print the final reward from the simulation
+    print(run_simulation()[-1])
