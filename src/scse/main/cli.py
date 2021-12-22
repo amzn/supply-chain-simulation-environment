@@ -45,6 +45,7 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
         return stop
 
     def _start(self, **run_parameters):
+
         self._horizon = run_parameters['time_horizon']
         self._actions = []
         self._breakpoints = []

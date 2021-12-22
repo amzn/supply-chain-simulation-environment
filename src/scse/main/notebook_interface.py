@@ -29,6 +29,9 @@ class miniSCOTnotebook():
                    asin_selection=self.DEFAULT_ASIN_SELECTION,
                    profile=self.DEFAULT_PROFILE)
 
+        # The cumulative reward at each time step i.e. the episode reward for each time-step
+        self.cum_reward = []
+
     def start(self, **run_parameters):
         self.horizon = run_parameters['time_horizon']
         self.actions = []
@@ -50,8 +53,9 @@ class miniSCOTnotebook():
                 break
             else:
                 self.state, self.actions, self.reward = self.env.step(self.state, self.actions)
+                self.cum_reward.append(self.reward.get('episode_reward').get('total'))
 
-        return self.reward
+        return self.cum_reward
 
 
 m = miniSCOTnotebook()
