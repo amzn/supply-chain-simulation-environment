@@ -39,13 +39,12 @@ This class will host the vars and functions to initialize the Bayesian Optimizat
 """
 
 class ExperimentLoop:
-    def __init__(self, name, f) -> None:
-        pass
+    def __init__(self, name, f, p_space: ParameterSpace, model: IModel, acq_func) -> None:
         self.name = name
         self.f = f
-        self.parameter_space: ParameterSpace = None
-        self.model: IModel = None
-        self.acquisition_func = None
+        self.parameter_space: ParameterSpace = p_space
+        self.model: IModel = model
+        self.acquisition_func = acq_func
 
 
 def f(X):
