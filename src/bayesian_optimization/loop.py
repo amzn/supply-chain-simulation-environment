@@ -1,6 +1,9 @@
 # Decision loops
 from emukit.core.interfaces.models import IModel
 from emukit.core.parameter_space import ParameterSpace
+from emukit.core import ParameterSpace, ContinuousParameter, DiscreteParameter
+from emukit.core.initial_designs import RandomDesign
+
 from emukit.experimental_design import ExperimentalDesignLoop
 from emukit.bayesian_optimization.loops import BayesianOptimizationLoop
 from emukit.quadrature.loop import VanillaBayesianQuadratureLoop
@@ -20,6 +23,10 @@ from emukit.core.loop import ConvergenceStoppingCondition
 # Models
 from emukit.model_wrappers import GPyModelWrapper
 from GPy.models import GPRegression
+
+# miniSCOT function
+from scse.api.simulation import run_simulation
+
 """
 Author: Max Bronckers
 
@@ -36,16 +43,44 @@ class ExperimentLoop:
         self.acquisition_func = None
 
 
+def f(X):
+    """
+    Handling API call to miniSCOT simulation given some inputs 
+    
+    X contains parameter configs x = [x0 x1 ...]
+    - The order of parameters in x should follow the order specified in the parameter_space declaration 
+    - E.g. here we specify num_batteries = x[0]
+
+    """
+    Y = []
+    for x in X:
+        num_batteries = x[0]
+
+        cum_reward = run_simulation(
+            time_horizon=336, num_batteries=num_batteries)
+
+        Y.append(cum_reward[-1])
+
+    Y = np.reshape(np.array(Y), (-1, 1))
+    return Y
+
 def main():
     loop = ExperimentLoop()
 
-    # Function to estimate
-    f = None # the API call to miniSCOT, which needs to be parsed
+    # Specify parameter space
+    max_num_batteries = 25
+    num_batteries = DiscreteParameter(
+        'num_batteries', [i for i in range(0, max_num_batteries)])
+    week = 336
+    time_horizon = DiscreteParameter(
+        'time_horizon', [i for i in range(0, 52*week, week)])
+    parameter_space = ParameterSpace([num_batteries])
+    design = RandomDesign(parameter_space)
 
-    # Initial design => initial set of batteries and associated reward of simulation
-
-    X = None # inputs: num_batteries, time_steps in simulation, battery size?
-    Y = None # reward metric
+    # Initial set of batteries and associated reward of simulation
+    num_data_points = 2
+    X = design.get_samples(num_data_points)
+    Y = f(X)
 
     # emulator model
     gpy_model = GPRegression(X, Y)
@@ -73,3 +108,5 @@ def main():
     bayesopt_loop.run_loop(loop.f, stopping_condition)
 
     # Visualize and get extrema
+    new_X, new_Y = (list(t) for t in zip(*sorted(zip(bayesopt_loop.loop_state.X,bayesopt_loop.loop_state.Y))))
+    print(max(new_Y))
