@@ -24,6 +24,11 @@ from emukit.core.loop import ConvergenceStoppingCondition
 from emukit.model_wrappers import GPyModelWrapper
 from GPy.models import GPRegression
 
+import numpy as np
+import logging
+logging.basicConfig(level=logging.INFO)
+
+
 # miniSCOT function
 from scse.api.simulation import run_simulation
 
@@ -65,7 +70,6 @@ def f(X):
     return Y
 
 def main():
-    loop = ExperimentLoop()
 
     # Specify parameter space
     max_num_batteries = 25
@@ -96,17 +100,20 @@ def main():
     # Create the Bayesian optimization object
     batch_size = 1 
     bayesopt_loop = BayesianOptimizationLoop(model=model_emukit,
-                                            space=loop.parameter_space,
+                                            space=parameter_space,
                                             acquisition=expected_improvement,
                                             batch_size=batch_size)
 
     # Run the loop and extract the optimum;  we either complete 10 steps or converge
-    max_iters = 10
+    max_iters = 1
     stopping_condition = FixedIterationsStoppingCondition(
         i_max=max_iters) | ConvergenceStoppingCondition(eps=0.01)
 
-    bayesopt_loop.run_loop(loop.f, stopping_condition)
+    bayesopt_loop.run_loop(f, stopping_condition)
 
     # Visualize and get extrema
     new_X, new_Y = (list(t) for t in zip(*sorted(zip(bayesopt_loop.loop_state.X,bayesopt_loop.loop_state.Y))))
     print(max(new_Y))
+
+if __name__ == "__main__":
+    main()
