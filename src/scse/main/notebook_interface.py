@@ -1,5 +1,6 @@
 from scse.controller import miniscot as miniSCOT
 
+
 class miniSCOTnotebook():
     DEFAULT_START_DATE = '2019-01-01'
     DEFAULT_TIME_INCREMENT = 'half-hourly'
@@ -9,13 +10,15 @@ class miniSCOTnotebook():
     DEFAULT_PROFILE = 'national_grid_profile'
     DEFAULT_NUM_BATTERIES = 10
     DEFAULT_MAX_BATTERY_CAPACITY = 50
+    DEFAULT_BATTERY_PENALTY = 500
 
     def __init__(self, simulation_seed=DEFAULT_SIMULATION_SEED,
                  start_date=DEFAULT_START_DATE,
                  time_increment=DEFAULT_TIME_INCREMENT,
                  time_horizon=DEFAULT_HORIZON,
                  num_batteries=DEFAULT_NUM_BATTERIES,
-                 max_battery_capacity=DEFAULT_MAX_BATTERY_CAPACITY):
+                 max_battery_capacity=DEFAULT_MAX_BATTERY_CAPACITY,
+                 battery_penalty=DEFAULT_BATTERY_PENALTY):
 
         self.simulation_seed = simulation_seed
         self.start_date = start_date
@@ -23,6 +26,7 @@ class miniSCOTnotebook():
         self.time_horizon = time_horizon
         self.num_batteries = num_batteries
         self.max_battery_capacity = max_battery_capacity
+        self.battery_penalty = battery_penalty
 
         self.start(simulation_seed=self.simulation_seed,
                    start_date=self.start_date,
@@ -31,7 +35,8 @@ class miniSCOTnotebook():
                    num_batteries=self.num_batteries,
                    asin_selection=self.DEFAULT_ASIN_SELECTION,
                    profile=self.DEFAULT_PROFILE,
-                   max_battery_capacity=self.max_battery_capacity)
+                   max_battery_capacity=self.max_battery_capacity,
+                   battery_penalty=self.battery_penalty)
 
         # The cumulative reward at each time step i.e. the episode reward for each time-step
         self.cum_reward = []
@@ -48,7 +53,8 @@ class miniSCOTnotebook():
 
     def next(self):
         """Execute a single time unit."""
-        self.state, self.actions, self.reward = self.env.step(self.state, self.actions)
+        self.state, self.actions, self.reward = self.env.step(
+            self.state, self.actions)
 
     def run(self):
         """Run simulation until the first break-point or, if none are enabled, until the end of time (the specified horizon)."""
@@ -56,8 +62,10 @@ class miniSCOTnotebook():
             if t in self.breakpoints:
                 break
             else:
-                self.state, self.actions, self.reward = self.env.step(self.state, self.actions)
-                self.cum_reward.append(self.reward.get('episode_reward').get('total'))
+                self.state, self.actions, self.reward = self.env.step(
+                    self.state, self.actions)
+                self.cum_reward.append(self.reward.get(
+                    'episode_reward').get('total'))
 
         return self.cum_reward
 

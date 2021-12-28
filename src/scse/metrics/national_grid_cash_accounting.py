@@ -24,7 +24,7 @@ class CashAccounting():
         self._lost_demand_penalty = 0
 
         # how much to reward/penalize battery use
-        self._holding_cost = 0  # 0.5
+        self._holding_cost = -20  # 0.5
 
     def reset(self, context, state):
         self._context = {}
