@@ -39,7 +39,8 @@ class SupplyChainEnvironment:
                  time_horizon=100,        # timestep horizon
                  asin_selection=1,
                  num_batteries=10,
-                 max_battery_capacity=50):       # how many / which asins to simulate
+                 max_battery_capacity=50,  # how many / which asins to simulate
+                 battery_penalty=500):
 
         self._program_start_time = time.time()
         self._miniscot_time_profile = {}
@@ -80,6 +81,8 @@ class SupplyChainEnvironment:
         current_program_time = time.time()
         self._miniscot_time_profile['miniscot_init'] = current_program_time - \
             self._program_start_time
+
+        self._battery_penalty = battery_penalty
 
     def get_initial_env_values(self):
         module_start_time = time.time()
@@ -132,12 +135,11 @@ class SupplyChainEnvironment:
         # penalize the use of many batteries
         # penalty scaled by capacity of battery
         # TODO: check that this makes sense
-        battery_penalty = 1
         G = state["network"]
         for node, node_data in G.nodes(data=True):
             if "Battery" in node:
                 self.episode_reward += - \
-                    (battery_penalty) * \
+                    (self._battery_penalty) * \
                     node_data["max_inventory"][ELECTRICITY_ASIN]
 
         module_end_time = time.time()

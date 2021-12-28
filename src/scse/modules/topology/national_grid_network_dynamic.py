@@ -10,6 +10,7 @@ from scse.constants.national_grid_constants import (
     DEFAULT_BALANCE_SINK
 )
 
+
 class NationalGridNetwork(Env):
     # Start with nothing, and allow 1 period for transit
     # Technically transfer should be instantaneous, but lets cheat a bit
@@ -134,7 +135,7 @@ class NationalGridNetwork(Env):
         axis_one = -3
         axis_two = 51
 
-        for battery_idx in range(self._num_batteries):
+        for battery_idx in range(round(self._num_batteries)):
             battery_loc = (axis_one, axis_two)
             # "Warehouse": batteries
             # note, assumes:
@@ -213,7 +214,7 @@ class NationalGridNetwork(Env):
         G.add_edge(ENERGY_GENERATION_LABELS.other, "Substation",
                    ** {'transit_time': self._transit_time, 'shipments': []})
 
-        for battery_idx in range(self._num_batteries):
+        for battery_idx in range(round(self._num_batteries)):
             # Substation to battery
             # Note: At later date may want to model direct source -> battery storage
             G.add_edge("Substation", f"Battery{battery_idx}",
