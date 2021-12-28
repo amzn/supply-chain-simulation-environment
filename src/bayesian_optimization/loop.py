@@ -89,10 +89,10 @@ class ExperimentLoop:
 
 def f(X):
     """
-    Handling API call to miniSCOT simulation given some inputs 
+    Handling API call to miniSCOT simulation given some inputs
 
     X contains parameter configs x = [x0 x1 ...]
-    - The order of parameters in x should follow the order specified in the parameter_space declaration 
+    - The order of parameters in x should follow the order specified in the parameter_space declaration
     - E.g. here we specify num_batteries = x[0]
 
     """
