@@ -17,14 +17,16 @@ class CashAccounting():
 
         # TODO: play with different weights on the penalties!
 
-        self._cost = 5
-        self._price = 10
+        self._cost = 10 * 3  # 5
+        self._price = 5  # 10
+        # self._cost = 5
+        # self._price = 10
         self._transfer_cost = 0  # 2 # cost to move from the batteries
 
         self._lost_demand_penalty = 0
 
         # how much to reward/penalize battery use
-        self._holding_cost = -20  # 0.5
+        self._holding_cost = 0  # -20
 
     def reset(self, context, state):
         self._context = {}
