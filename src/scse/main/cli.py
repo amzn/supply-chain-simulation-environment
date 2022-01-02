@@ -8,7 +8,9 @@ import networkx as nx
 from itertools import cycle
 from collections import defaultdict
 import matplotlib.pyplot as plt
+
 from scse.controller import miniscot as miniSCOT
+from scse.default_run_parameters.national_grid_default_run_parameters import DEFAULT_RUN_PARAMETERS
 
 
 class MiniSCOTDebuggerApp(cmd2.Cmd):
@@ -18,9 +20,6 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
     _DEFAULT_SIMULATION_SEED = 12345
     _DEFAULT_ASIN_SELECTION = 0  # or use an integer value to select the number of asins
     _DEFAULT_PROFILE = 'national_grid_profile'
-    _DEFAULT_NUM_BATTERIES = 10
-    _DEFAULT_MAX_BATTERY_CAPACITY = 50
-    _DEFAULT_BATTERY_PENALTY = 500
 
     def __init__(self, **args):
         super().__init__(args)
@@ -35,9 +34,9 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
                     time_horizon=self._DEFAULT_HORIZON,
                     asin_selection=self._DEFAULT_ASIN_SELECTION,
                     profile=self._DEFAULT_PROFILE,
-                    num_batteries=self._DEFAULT_NUM_BATTERIES,
-                    max_battery_capacity=self._DEFAULT_MAX_BATTERY_CAPACITY,
-                    battery_penalty=self._DEFAULT_BATTERY_PENALTY)
+                    num_batteries=DEFAULT_RUN_PARAMETERS.num_batteries,
+                    max_battery_capacity=DEFAULT_RUN_PARAMETERS.max_battery_capacity,
+                    battery_penalty=DEFAULT_RUN_PARAMETERS.battery_penalty)
 
         self._set_prompt()
 
@@ -61,8 +60,6 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
         self._env.reset_agents(self._context, self._state)
 
     param_parser = argparse.ArgumentParser()
-    param_parser.add_argument('--max_battery_capacity', help="max battery capacity (default 50)",
-                              type=int, default=_DEFAULT_MAX_BATTERY_CAPACITY)
     param_parser.add_argument(
         '--start_date', help="simulation will at date 'yyyy-mm-dd' (default 2019-01-01)", type=str, default=_DEFAULT_START_DATE)
     param_parser.add_argument(
@@ -76,9 +73,19 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
     param_parser.add_argument(
         '--profile', help="profile (default minimal)", type=str, default=_DEFAULT_PROFILE)
     param_parser.add_argument(
-        '--num_batteries', help="number of batteries (default 10)", type=int, default=_DEFAULT_NUM_BATTERIES)
+        '--num_batteries',
+        help=f"number of batteries (default {DEFAULT_RUN_PARAMETERS.num_batteries})",
+        type=int, default=DEFAULT_RUN_PARAMETERS.num_batteries)
     param_parser.add_argument(
-        '--battery_penalty', help=f"penalty for the addition of a new battery (default {_DEFAULT_BATTERY_PENALTY})", type=int, default=_DEFAULT_BATTERY_PENALTY)
+        '--max_battery_capacity',
+        help=f"max battery capacity (default {DEFAULT_RUN_PARAMETERS.max_battery_capacity})",
+        type=int, default=DEFAULT_RUN_PARAMETERS.max_battery_capacity)
+    param_parser.add_argument(
+        '--battery_penalty',
+        help=(
+            f"penalty for the addition of a new battery (default {DEFAULT_RUN_PARAMETERS.battery_penalty})"
+        ),
+        type=int, default=DEFAULT_RUN_PARAMETERS.battery_penalty)
     #param_parser.add_argument('-asin', help="list of ASINs.", action='append', default=_DEFAULT_ASIN_LIST)
 
     @cmd2.with_argparser(param_parser)

@@ -1,24 +1,17 @@
 from scse.main.notebook_interface import miniSCOTnotebook
+from scse.default_run_parameters.national_grid_default_run_parameters import DEFAULT_RUN_PARAMETERS
+
 import logging
 
-DEFAULT_LOGGING_LEVEL = 'CRITICAL'
-DEFAULT_START_DATE = '2019-01-01'
-DEFAULT_TIME_INCREMENT = 'half-hourly'
-DEFAULT_HORIZON = 100
-DEFAULT_SIMULATION_SEED = 12345
-DEFAULT_NUM_BATTERIES = 1
-DEFAULT_MAX_BATTERY_CAPACITY = 50
-DEFAULT_BATTERY_PENALTY = 500
 
-
-def run_simulation(logging_level=DEFAULT_LOGGING_LEVEL,
-                   simulation_seed=DEFAULT_SIMULATION_SEED,
-                   start_date=DEFAULT_START_DATE,
-                   time_increment=DEFAULT_TIME_INCREMENT,
-                   time_horizon=DEFAULT_HORIZON,
-                   num_batteries=DEFAULT_NUM_BATTERIES,
-                   max_battery_capacity=DEFAULT_MAX_BATTERY_CAPACITY,
-                   battery_penalty=DEFAULT_BATTERY_PENALTY):
+def run_simulation(logging_level=DEFAULT_RUN_PARAMETERS.logging_level,
+                   simulation_seed=DEFAULT_RUN_PARAMETERS.simulation_seed,
+                   start_date=DEFAULT_RUN_PARAMETERS.start_date,
+                   time_increment=DEFAULT_RUN_PARAMETERS.time_increment,
+                   time_horizon=DEFAULT_RUN_PARAMETERS.time_horizon,
+                   num_batteries=DEFAULT_RUN_PARAMETERS.num_batteries,
+                   max_battery_capacity=DEFAULT_RUN_PARAMETERS.max_battery_capacity,
+                   battery_penalty=DEFAULT_RUN_PARAMETERS.battery_penalty):
 
     logger = logging.getLogger()
     if logging_level == 'DEBUG':

@@ -17,6 +17,9 @@ from scse.profiles.profile import load_profile, instantiate_class
 from scse.constants.national_grid_constants import (
     ELECTRICITY_ASIN
 )
+from scse.default_run_parameters.national_grid_default_run_parameters import (
+    DEFAULT_RUN_PARAMETERS
+)
 
 # TODO Right now, let's log all by setting DEBUG at the root level...
 # Later remove and let it be configured.
@@ -32,15 +35,15 @@ class SupplyChainEnvironment:
     #  'run parameters' to be specified directly in the profiles.
     # The trade-off is that profile values are not meant to change (per run).
     def __init__(self,
-                 profile='national_grid_profile.json',       # defines the set of modules to use
-                 simulation_seed=12345,   # controls randomness throughout simulation
-                 start_date='2019-01-01',  # simulation start date
-                 time_increment='daily',  # timestep increment
-                 time_horizon=100,        # timestep horizon
-                 asin_selection=1,
-                 num_batteries=10,
-                 max_battery_capacity=50,  # how many / which asins to simulate
-                 battery_penalty=500):
+                 profile=DEFAULT_RUN_PARAMETERS.run_profile,       # defines the set of modules to use
+                 simulation_seed=DEFAULT_RUN_PARAMETERS.simulation_seed,   # controls randomness throughout simulation
+                 start_date=DEFAULT_RUN_PARAMETERS.start_date,  # simulation start date
+                 time_increment=DEFAULT_RUN_PARAMETERS.time_increment,  # timestep increment
+                 time_horizon=DEFAULT_RUN_PARAMETERS.time_horizon,        # timestep horizon
+                 asin_selection=DEFAULT_RUN_PARAMETERS.asin_selection,  # how many / which asins to simulate
+                 num_batteries=DEFAULT_RUN_PARAMETERS.num_batteries,
+                 max_battery_capacity=DEFAULT_RUN_PARAMETERS.max_battery_capacity,  
+                 battery_penalty=DEFAULT_RUN_PARAMETERS.battery_penalty):
 
         self._program_start_time = time.time()
         self._miniscot_time_profile = {}
