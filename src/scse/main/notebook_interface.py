@@ -1,25 +1,23 @@
 from scse.controller import miniscot as miniSCOT
+from scse.default_run_parameters.national_grid_default_run_parameters import DEFAULT_RUN_PARAMETERS
 
 
 class miniSCOTnotebook():
-    DEFAULT_START_DATE = '2019-01-01'
-    DEFAULT_TIME_INCREMENT = 'half-hourly'
-    DEFAULT_HORIZON = 100
-    DEFAULT_SIMULATION_SEED = 12345
-    DEFAULT_ASIN_SELECTION = 0
-    DEFAULT_PROFILE = 'national_grid_profile'
-    DEFAULT_NUM_BATTERIES = 10
-    DEFAULT_MAX_BATTERY_CAPACITY = 50
-    DEFAULT_BATTERY_PENALTY = 500
 
-    def __init__(self, simulation_seed=DEFAULT_SIMULATION_SEED,
-                 start_date=DEFAULT_START_DATE,
-                 time_increment=DEFAULT_TIME_INCREMENT,
-                 time_horizon=DEFAULT_HORIZON,
-                 num_batteries=DEFAULT_NUM_BATTERIES,
-                 max_battery_capacity=DEFAULT_MAX_BATTERY_CAPACITY,
-                 battery_penalty=DEFAULT_BATTERY_PENALTY):
 
+    def __init__(
+        self,
+        simulation_seed=DEFAULT_RUN_PARAMETERS.simulation_seed,
+        start_date=DEFAULT_RUN_PARAMETERS.start_date,
+        time_increment=DEFAULT_RUN_PARAMETERS.time_increment,
+        time_horizon=DEFAULT_RUN_PARAMETERS.time_horizon,
+        num_batteries=DEFAULT_RUN_PARAMETERS.num_batteries,
+        max_battery_capacity=DEFAULT_RUN_PARAMETERS.max_battery_capacity,
+        battery_penalty=DEFAULT_RUN_PARAMETERS.battery_penalty
+        ):
+
+        self.profile = DEFAULT_RUN_PARAMETERS.run_profile
+        self.asin_selection = DEFAULT_RUN_PARAMETERS.asin_selection
         self.simulation_seed = simulation_seed
         self.start_date = start_date
         self.time_increment = time_increment
@@ -33,8 +31,8 @@ class miniSCOTnotebook():
                    time_increment=self.time_increment,
                    time_horizon=self.time_horizon,
                    num_batteries=self.num_batteries,
-                   asin_selection=self.DEFAULT_ASIN_SELECTION,
-                   profile=self.DEFAULT_PROFILE,
+                   asin_selection=self.asin_selection,
+                   profile=self.profile,
                    max_battery_capacity=self.max_battery_capacity,
                    battery_penalty=self.battery_penalty)
 
