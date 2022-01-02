@@ -4,7 +4,7 @@ from scse.default_run_parameters.national_grid_default_run_parameters import DEF
 import logging
 
 
-def run_simulation(logging_level=DEFAULT_RUN_PARAMETERS.logging_level,
+def run_simulation(logging_level='CRITICAL',
                    simulation_seed=DEFAULT_RUN_PARAMETERS.simulation_seed,
                    start_date=DEFAULT_RUN_PARAMETERS.start_date,
                    time_increment=DEFAULT_RUN_PARAMETERS.time_increment,

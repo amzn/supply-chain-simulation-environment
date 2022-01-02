@@ -11,6 +11,7 @@ class _RunParameters(CoreRunParameters):
     time_increment = 'half-hourly'
 
     # Bespoke parameters
+    simulation_logging_level = 'CRITICAL'
     num_batteries = 1
     max_battery_capacity = 50
     battery_penalty = 500
