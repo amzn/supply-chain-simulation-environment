@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class ElectricityDemandForecast(Service):
-    _DEFAULT_BMRS_SOURCE = 'FUELHH'
+    _DEFAULT_BMRS_SOURCE = 'combined'
 
     def __init__(self, run_parameters):
         """

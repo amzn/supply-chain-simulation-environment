@@ -53,25 +53,20 @@ class NationalGridNetwork(Env):
         # These could be further broken down
         # Have only added a subset for now
         # Added `asins_produced` property
-        # G.add_node(ENERGY_GENERATION_LABELS.solar,
-        #            node_type='vendor',
-        #            asins_produced=[ENERGY_GENERATION_ASINS.solar],
-        #            location=(-3.7210765082286055, 50.51499818530821)
-        #            )
-        # G.add_node(ENERGY_GENERATION_LABELS.wind_onshore,
-        #            node_type='vendor',
-        #            asins_produced=[ENERGY_GENERATION_ASINS.wind_onshore],
-        #            location=(-2.692165321894899, 56.541558049898015)
-        #            )
-        # G.add_node(ENERGY_GENERATION_LABELS.wind_offshore,
-        #            node_type='vendor',
-        #            asins_produced=[ENERGY_GENERATION_ASINS.wind_offshore],
-        #            location=(-0.054598091962716026, 57.08463527849611)
-        #            )
-        G.add_node(ENERGY_GENERATION_LABELS.wind_combined,
+        G.add_node(ENERGY_GENERATION_LABELS.solar,
                    node_type='vendor',
-                   asins_produced=[ENERGY_GENERATION_ASINS.wind_combined],
+                   asins_produced=[ENERGY_GENERATION_ASINS.solar],
+                   location=(-3.7210765082286055, 50.51499818530821)
+                   )
+        G.add_node(ENERGY_GENERATION_LABELS.wind_onshore,
+                   node_type='vendor',
+                   asins_produced=[ENERGY_GENERATION_ASINS.wind_onshore],
                    location=(-2.692165321894899, 56.541558049898015)
+                   )
+        G.add_node(ENERGY_GENERATION_LABELS.wind_offshore,
+                   node_type='vendor',
+                   asins_produced=[ENERGY_GENERATION_ASINS.wind_offshore],
+                   location=(-0.054598091962716026, 57.08463527849611)
                    )
         G.add_node(ENERGY_GENERATION_LABELS.hydro_storage,
                    node_type='vendor',
@@ -113,11 +108,11 @@ class NationalGridNetwork(Env):
                    asins_produced=[ENERGY_GENERATION_ASINS.interconnector],
                    location=(2.1426203852648205, 51.00722532120002)
                    )
-        G.add_node(ENERGY_GENERATION_LABELS.other,
-                   node_type='vendor',
-                   asins_produced=[ENERGY_GENERATION_ASINS.other],
-                   location=(-1.7187199226929328, 55.56573138678091)
-                   )
+        # G.add_node(ENERGY_GENERATION_LABELS.other,
+        #            node_type='vendor',
+        #            asins_produced=[ENERGY_GENERATION_ASINS.other],
+        #            location=(-1.7187199226929328, 55.56573138678091)
+        #            )
 
         # "Port": electricity substations
         # Could also define as warehouses, but provides differentiation
@@ -187,13 +182,11 @@ class NationalGridNetwork(Env):
         ##############
 
         # Electricity sources to substation
-        # G.add_edge(ENERGY_GENERATION_LABELS.solar, "Substation",
-        #            ** {'transit_time': self._transit_time, 'shipments': []})
-        # G.add_edge(ENERGY_GENERATION_LABELS.wind_onshore, "Substation",
-        #            ** {'transit_time': self._transit_time, 'shipments': []})
-        # G.add_edge(ENERGY_GENERATION_LABELS.wind_offshore, "Substation",
-        #            ** {'transit_time': self._transit_time, 'shipments': []})
-        G.add_edge(ENERGY_GENERATION_LABELS.wind_combined, "Substation",
+        G.add_edge(ENERGY_GENERATION_LABELS.solar, "Substation",
+                   ** {'transit_time': self._transit_time, 'shipments': []})
+        G.add_edge(ENERGY_GENERATION_LABELS.wind_onshore, "Substation",
+                   ** {'transit_time': self._transit_time, 'shipments': []})
+        G.add_edge(ENERGY_GENERATION_LABELS.wind_offshore, "Substation",
                    ** {'transit_time': self._transit_time, 'shipments': []})
         G.add_edge(ENERGY_GENERATION_LABELS.hydro_storage, "Substation",
                    ** {'transit_time': self._transit_time, 'shipments': []})
@@ -210,8 +203,6 @@ class NationalGridNetwork(Env):
         G.add_edge(ENERGY_GENERATION_LABELS.nuclear, "Substation",
                    ** {'transit_time': self._transit_time, 'shipments': []})
         G.add_edge(ENERGY_GENERATION_LABELS.interconnector, "Substation",
-                   ** {'transit_time': self._transit_time, 'shipments': []})
-        G.add_edge(ENERGY_GENERATION_LABELS.other, "Substation",
                    ** {'transit_time': self._transit_time, 'shipments': []})
 
         for battery_idx in range(round(self._num_batteries)):
