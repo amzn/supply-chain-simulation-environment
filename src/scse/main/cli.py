@@ -14,12 +14,6 @@ from scse.default_run_parameters.national_grid_default_run_parameters import DEF
 
 
 class MiniSCOTDebuggerApp(cmd2.Cmd):
-    _DEFAULT_START_DATE = '2019-01-01'
-    _DEFAULT_TIME_INCREMENT = 'half-hourly'
-    _DEFAULT_HORIZON = 5
-    _DEFAULT_SIMULATION_SEED = 12345
-    _DEFAULT_ASIN_SELECTION = 0  # or use an integer value to select the number of asins
-    _DEFAULT_PROFILE = 'national_grid_profile'
 
     def __init__(self, **args):
         super().__init__(args)
@@ -28,12 +22,12 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
               "to initialize the environment correctly. Then run 'run'.")
         # self.intro = self.colorize("Welcome to miniSCOT - your Supply Chain in a bottle.", 'cyan')
 
-        self._start(simulation_seed=self._DEFAULT_SIMULATION_SEED,
-                    start_date=self._DEFAULT_START_DATE,
-                    time_increment=self._DEFAULT_TIME_INCREMENT,
-                    time_horizon=self._DEFAULT_HORIZON,
-                    asin_selection=self._DEFAULT_ASIN_SELECTION,
-                    profile=self._DEFAULT_PROFILE,
+        self._start(simulation_seed=DEFAULT_RUN_PARAMETERS.simulation_seed,
+                    start_date=DEFAULT_RUN_PARAMETERS.start_date,
+                    time_increment=DEFAULT_RUN_PARAMETERS.time_increment,
+                    time_horizon=DEFAULT_RUN_PARAMETERS.time_horizon,
+                    asin_selection=DEFAULT_RUN_PARAMETERS.asin_selection,
+                    profile=DEFAULT_RUN_PARAMETERS.run_profile,
                     num_batteries=DEFAULT_RUN_PARAMETERS.num_batteries,
                     max_battery_capacity=DEFAULT_RUN_PARAMETERS.max_battery_capacity,
                     battery_penalty=DEFAULT_RUN_PARAMETERS.battery_penalty)
@@ -61,17 +55,17 @@ class MiniSCOTDebuggerApp(cmd2.Cmd):
 
     param_parser = argparse.ArgumentParser()
     param_parser.add_argument(
-        '--start_date', help="simulation will at date 'yyyy-mm-dd' (default 2019-01-01)", type=str, default=_DEFAULT_START_DATE)
+        '--start_date', help="simulation will at date 'yyyy-mm-dd' (default 2019-01-01)", type=str, default=DEFAULT_RUN_PARAMETERS.start_date)
     param_parser.add_argument(
-        '--time_increment', help="increment time daily or hourly (default 'daily')", type=str, default=_DEFAULT_TIME_INCREMENT)
+        '--time_increment', help="increment time daily or hourly (default 'daily')", type=str, default=DEFAULT_RUN_PARAMETERS.time_increment)
     param_parser.add_argument(
-        '--horizon', help="total time units to simulate (default 100)", type=int, default=_DEFAULT_HORIZON)
+        '--horizon', help="total time units to simulate (default 100)", type=int, default=DEFAULT_RUN_PARAMETERS.time_horizon)
     param_parser.add_argument(
-        '--seed', help="simulation random seed (default 12345)", type=int, default=_DEFAULT_SIMULATION_SEED)
+        '--seed', help="simulation random seed (default 12345)", type=int, default=DEFAULT_RUN_PARAMETERS.simulation_seed)
     param_parser.add_argument(
-        '--asin_selection', help="number of ASINs to use (default 10)", type=int, default=_DEFAULT_ASIN_SELECTION)
+        '--asin_selection', help="number of ASINs to use (default 10)", type=int, default=DEFAULT_RUN_PARAMETERS.asin_selection)
     param_parser.add_argument(
-        '--profile', help="profile (default minimal)", type=str, default=_DEFAULT_PROFILE)
+        '--profile', help="profile (default minimal)", type=str, default=DEFAULT_RUN_PARAMETERS.run_profile)
     param_parser.add_argument(
         '--num_batteries',
         help=f"number of batteries (default {DEFAULT_RUN_PARAMETERS.num_batteries})",
