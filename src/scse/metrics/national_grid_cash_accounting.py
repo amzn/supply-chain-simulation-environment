@@ -17,8 +17,8 @@ class CashAccounting():
 
         # TODO: play with different weights on the penalties!
 
-        self._cost = 10 * 3  # 5
-        self._price = 5  # 10
+        self._cost = 149.8
+        self._price = 32.0
         # self._cost = 5
         # self._price = 10
         self._transfer_cost = 0  # 2 # cost to move from the batteries
