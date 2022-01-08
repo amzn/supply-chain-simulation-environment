@@ -26,8 +26,7 @@ class _RunParameters(CoreRunParameters):
         - https://electrek.co/2021/07/26/tesla-reveals-megapack-prices/
     '''
     max_battery_capacity = 15  #  units in MWh
-    init_battery_capacity = max_battery_capacity * 0.2
+    init_battery_capacity = int(max_battery_capacity * 0.2)
     battery_penalty = 735916.40  # units in £s
-
 
 DEFAULT_RUN_PARAMETERS = _RunParameters()
