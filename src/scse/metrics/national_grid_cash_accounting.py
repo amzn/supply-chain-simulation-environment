@@ -16,8 +16,11 @@ class CashAccounting():
         # Hardcoding vendor cost, customer price, holding cost, and lost demand penalty
 
         # updated for realistic values, w/ units £/MWh
-        self._cost = 149.8
-        self._price = 32.0
+        self._source_request = -149.8
+        self._sink_deposit = 32.0
+
+        self._battery_charging = -32.0
+        self._battery_drawdown = 149.8
         # self._cost = 5
         # self._price = 10
         self._transfer_cost = 0  # 2 # cost to move from the batteries
@@ -44,9 +47,11 @@ class CashAccounting():
         G = state["network"]
         for node, node_data in G.nodes(data=True):
             if "Battery" in node:
+                # self._upfront_battery_cost += - \
+                #     (battery_penalty) * \
+                #     node_data["max_inventory"][ELECTRICITY_ASIN]
                 self._upfront_battery_cost += - \
-                    (battery_penalty) * \
-                    node_data["max_inventory"][ELECTRICITY_ASIN]
+                    (battery_penalty)
 
         # We'll use this to track unfilled demand, since this builds up
         self._cumulative_customer_orders = []
@@ -74,14 +79,15 @@ class CashAccounting():
 
             # we only care about the case where we interact w/ balance scheme
             if action['destination'] == DEFAULT_BALANCE_SINK:
-                revenue = self._price * quantity
+                revenue = self._sink_deposit * quantity
 
                 # add to timestep aggregate metrics, to be logged later
                 self._timestep_revenue += revenue
                 self._timestep_sales_quantity += quantity
 
-                # negative when we give to sink (unused supply = bad!)
-                reward = -revenue
+                # note: depending on view, when we give to sink:
+                # unused supply can either be good or bad
+                reward = revenue
             else:
                 # note: could return to positive reward when give to consumers
                 # for now, ignore
@@ -92,13 +98,13 @@ class CashAccounting():
 
             # we only care about the case where we interact w/ balance scheme
             if action['origin'] == DEFAULT_BALANCE_SOURCE:
-                cost = self._cost * quantity
+                cost = self._source_request * quantity
 
                 # add to timestep aggregate metrics, to be logged later
                 self._timestep_vendor_cost += cost
 
-                # negative (bad) when we draw from the source
-                reward = -1 * cost
+                # bad when we draw from the source
+                reward = cost  #  assumes penalty is already negative
             else:
                 # note: could also penalize when draw from other sources
                 reward = 0
@@ -106,12 +112,12 @@ class CashAccounting():
         elif actionType == 'transfer':
             # substations => batteries
 
-            # modulate by changing _transfer_cost in init()
-            cost = self._transfer_cost * quantity
+            # cost of charging a battery
+            cost = self._battery_charging * quantity
 
             self._timestep_transfer_cost += cost
 
-            reward = -1 * cost
+            reward = cost
 
         elif actionType == 'advance_time':
             reward = {}
