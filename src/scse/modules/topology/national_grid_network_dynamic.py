@@ -20,10 +20,6 @@ class NationalGridNetwork(Env):
     _DEFAULT_INITIAL_INVENTORY = 0
     _DEFAULT_TRANSIT_TIME = 1
 
-    #  size of a unit battery
-    _DEFAULT_MAX_BATTERY_CAPACITY = DEFAULT_RUN_PARAMETERS.max_battery_capacity
-    _DEFAULT_INIT_BATTERY_CAPACITY = int(_DEFAULT_MAX_BATTERY_CAPACITY * 0.2)
-
     def __init__(self, run_parameters):
         """
         Highly simplified digital twin of the network.
@@ -33,9 +29,9 @@ class NationalGridNetwork(Env):
         self._transit_time = run_parameters.get(
             'transit_time', self._DEFAULT_TRANSIT_TIME)
         self._max_battery_capacity = run_parameters.get(
-            'max_battery_capacity', self._DEFAULT_MAX_BATTERY_CAPACITY)
+            'max_battery_capacity', DEFAULT_RUN_PARAMETERS.max_battery_capacity)
         self._init_battery_capacity = run_parameters.get(
-            'init_battery_capacity', self._DEFAULT_INIT_BATTERY_CAPACITY)
+            'init_battery_capacity', DEFAULT_RUN_PARAMETERS.init_battery_capacity)
 
         self._num_batteries = run_parameters.get(
             'num_batteries', DEFAULT_RUN_PARAMETERS.num_batteries)
