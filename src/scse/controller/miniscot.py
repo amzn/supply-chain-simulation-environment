@@ -35,14 +35,17 @@ class SupplyChainEnvironment:
     #  'run parameters' to be specified directly in the profiles.
     # The trade-off is that profile values are not meant to change (per run).
     def __init__(self,
-                 profile=DEFAULT_RUN_PARAMETERS.run_profile,       # defines the set of modules to use
-                 simulation_seed=DEFAULT_RUN_PARAMETERS.simulation_seed,   # controls randomness throughout simulation
+                 # defines the set of modules to use
+                 profile=DEFAULT_RUN_PARAMETERS.run_profile,
+                 # controls randomness throughout simulation
+                 simulation_seed=DEFAULT_RUN_PARAMETERS.simulation_seed,
                  start_date=DEFAULT_RUN_PARAMETERS.start_date,  # simulation start date
                  time_increment=DEFAULT_RUN_PARAMETERS.time_increment,  # timestep increment
                  time_horizon=DEFAULT_RUN_PARAMETERS.time_horizon,        # timestep horizon
-                 asin_selection=DEFAULT_RUN_PARAMETERS.asin_selection,  # how many / which asins to simulate
+                 # how many / which asins to simulate
+                 asin_selection=DEFAULT_RUN_PARAMETERS.asin_selection,
                  num_batteries=DEFAULT_RUN_PARAMETERS.num_batteries,
-                 max_battery_capacity=DEFAULT_RUN_PARAMETERS.max_battery_capacity,  
+                 max_battery_capacity=DEFAULT_RUN_PARAMETERS.max_battery_capacity,
                  battery_penalty=DEFAULT_RUN_PARAMETERS.battery_penalty):
 
         self._program_start_time = time.time()
@@ -135,16 +138,6 @@ class SupplyChainEnvironment:
                 if module_state:
                     state[module.get_name()] = module_state
 
-        # penalize the use of many batteries
-        # penalty scaled by capacity of battery
-        # TODO: check that this makes sense
-        G = state["network"]
-        for node, node_data in G.nodes(data=True):
-            if "Battery" in node:
-                self.episode_reward += - \
-                    (self._battery_penalty) * \
-                    node_data["max_inventory"][ELECTRICITY_ASIN]
-
         module_end_time = time.time()
         self._miniscot_time_profile['initial_env_values'] = module_end_time - \
             module_start_time
@@ -171,9 +164,11 @@ class SupplyChainEnvironment:
                 )+" reset"] = module_end_time - module_start_time
                 self._miniscot_time_profile[module.get_name(
                 )+" compute_actions"] = 0
-        self._metrics.reset(context, state)
+        self._metrics.reset(context, state, self._battery_penalty)
         logger.debug("trying to reset signed-in services")
         registry.reset_signed_in_services(context)
+
+        self.episode_reward += self._metrics._upfront_battery_cost
 
         self._miniscot_time_profile["miniscot_action_execution"] = 0
         self._miniscot_time_profile["miniscot_advance_time"] = 0

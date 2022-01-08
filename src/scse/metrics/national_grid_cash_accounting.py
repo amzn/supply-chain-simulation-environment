@@ -5,7 +5,7 @@ import logging
 from os.path import dirname, join
 import csv
 from scse.constants.national_grid_constants import (
-    DEFAULT_BALANCE_SOURCE, DEFAULT_BALANCE_SINK
+    DEFAULT_BALANCE_SOURCE, DEFAULT_BALANCE_SINK, ELECTRICITY_ASIN
 )
 logger = logging.getLogger(__name__)
 
@@ -15,8 +15,7 @@ class CashAccounting():
         self._time_horizon = run_parameters['time_horizon']
         # Hardcoding vendor cost, customer price, holding cost, and lost demand penalty
 
-        # TODO: play with different weights on the penalties!
-
+        # updated for realistic values, w/ units £/MWh
         self._cost = 149.8
         self._price = 32.0
         # self._cost = 5
@@ -28,7 +27,7 @@ class CashAccounting():
         # how much to reward/penalize battery use
         self._holding_cost = 0  # -20
 
-    def reset(self, context, state):
+    def reset(self, context, state, battery_penalty=50):
         self._context = {}
         self._context['asin_list'] = context['asin_list']
 
@@ -37,6 +36,17 @@ class CashAccounting():
         self._timestep_holding_cost = 0
         self._timestep_transfer_cost = 0
         self._timestep_sales_quantity = 0
+        self._upfront_battery_cost = 0
+
+        # penalize the use of many batteries
+        # penalty scaled by capacity of battery
+        # TODO: check that this makes sense
+        G = state["network"]
+        for node, node_data in G.nodes(data=True):
+            if "Battery" in node:
+                self._upfront_battery_cost += - \
+                    (battery_penalty) * \
+                    node_data["max_inventory"][ELECTRICITY_ASIN]
 
         # We'll use this to track unfilled demand, since this builds up
         self._cumulative_customer_orders = []
