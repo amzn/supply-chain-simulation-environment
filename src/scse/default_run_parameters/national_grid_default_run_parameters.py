@@ -14,9 +14,13 @@ class _RunParameters(CoreRunParameters):
 
     # Bespoke parameters
     simulation_logging_level = 'CRITICAL'
-    num_batteries = 1
+    num_batteries = 25
+
+    # for now, assumes all batteries are of same capacity
+    # TODO: modify to handle capacity which scales with cost
     max_battery_capacity = 50
-    battery_penalty = 5000
+    init_battery_capacity = max_battery_capacity * 0.2
+    battery_penalty = 5000  # "cost" of a battery
 
 
 DEFAULT_RUN_PARAMETERS = _RunParameters()

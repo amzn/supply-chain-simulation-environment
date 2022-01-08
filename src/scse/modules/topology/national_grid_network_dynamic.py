@@ -9,6 +9,9 @@ from scse.constants.national_grid_constants import (
     DEFAULT_BALANCE_SOURCE,
     DEFAULT_BALANCE_SINK
 )
+from scse.default_run_parameters.national_grid_default_run_parameters import (
+    DEFAULT_RUN_PARAMETERS
+)
 
 
 class NationalGridNetwork(Env):
@@ -17,10 +20,9 @@ class NationalGridNetwork(Env):
     _DEFAULT_INITIAL_INVENTORY = 0
     _DEFAULT_TRANSIT_TIME = 1
 
-    _DEFAULT_MAX_BATTERY_CAPACITY = 50  #  size of a unit battery
+    #  size of a unit battery
+    _DEFAULT_MAX_BATTERY_CAPACITY = DEFAULT_RUN_PARAMETERS.max_battery_capacity
     _DEFAULT_INIT_BATTERY_CAPACITY = int(_DEFAULT_MAX_BATTERY_CAPACITY * 0.2)
-
-    _DEFAULT_NUM_BATTERIES = 25
 
     def __init__(self, run_parameters):
         """
@@ -36,7 +38,7 @@ class NationalGridNetwork(Env):
             'init_battery_capacity', self._DEFAULT_INIT_BATTERY_CAPACITY)
 
         self._num_batteries = run_parameters.get(
-            'num_batteries', self._DEFAULT_NUM_BATTERIES)
+            'num_batteries', DEFAULT_RUN_PARAMETERS.num_batteries)
 
     def get_name(self):
         return 'network'
