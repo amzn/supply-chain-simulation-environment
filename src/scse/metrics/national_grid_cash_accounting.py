@@ -15,34 +15,39 @@ logger = logging.getLogger(__name__)
 
 
 class CashAccounting():
-    def __init__(
-        self,
-        run_parameters,
-        battery_penalty = DEFAULT_RUN_PARAMETERS.battery_penalty,
-        source_request = DEFAULT_RUN_PARAMETERS.source_request_reward_penalty,
-        sink_deposit = DEFAULT_RUN_PARAMETERS.sink_deposit_reward_penalty,
-        battery_drawdown = DEFAULT_RUN_PARAMETERS.battery_drawdown_reward_penalty,
-        battery_charging = DEFAULT_RUN_PARAMETERS.battery_charging_reward_penalty,
-        transfer = DEFAULT_RUN_PARAMETERS.transfer_penalty,
-        lost_demand = DEFAULT_RUN_PARAMETERS.lost_demand_penalty,
-        holding_cost =DEFAULT_RUN_PARAMETERS.holding_cost_penalty
-        ):
+    def __init__(self, run_parameters):
 
         self._time_horizon = run_parameters['time_horizon']
 
         # Battery CAPEX/OPEX penalties, w/ units £/MWh
-        self._battery_penalty = battery_penalty
-        self._holding_cost = holding_cost  # how much to reward/penalize battery use
-        self._transfer_cost = transfer  # cost to move from the batteries
+        self._battery_penalty = run_parameters.get(
+            'battery_penalty', DEFAULT_RUN_PARAMETERS.battery_penalty
+        )
+        self._holding_cost = run_parameters.get(
+            'holding_cost', DEFAULT_RUN_PARAMETERS.holding_cost_penalty
+        )  # how much to reward/penalize battery use
+        self._transfer_cost = run_parameters.get(
+            'transfer', DEFAULT_RUN_PARAMETERS.transfer_penalty
+        )  # cost to move from the batteries
 
         # Rewards/penalties for using BMRS and batteries
-        self._source_request = source_request
-        self._sink_deposit = sink_deposit
-        self._battery_charging = battery_charging
-        self._battery_drawdown = battery_drawdown
+        self._source_request = run_parameters.get(
+            'source_request', DEFAULT_RUN_PARAMETERS.source_request_reward_penalty
+        )
+        self._sink_deposit = run_parameters.get(
+            'sink_deposit', DEFAULT_RUN_PARAMETERS.sink_deposit_reward_penalty
+        )
+        self._battery_charging = run_parameters.get(
+            'battery_charging', DEFAULT_RUN_PARAMETERS.battery_charging_reward_penalty
+        )
+        self._battery_drawdown = run_parameters.get(
+            'battery_drawdown', DEFAULT_RUN_PARAMETERS.battery_drawdown_reward_penalty
+        )
 
         # Other penalties
-        self._lost_demand_penalty = lost_demand
+        self._lost_demand_penalty = run_parameters.get(
+            'lost_demand', DEFAULT_RUN_PARAMETERS.lost_demand_penalty
+        )
         
 
     def reset(self, context, state):
@@ -60,7 +65,7 @@ class CashAccounting():
         # penalty scaled by capacity of battery
         # TODO: check that this makes sense
         G = state["network"]
-        for node, node_data in G.nodes(data=True):
+        for node, _ in G.nodes(data=True):
             if "Battery" in node:
                 # self._upfront_battery_cost += - \
                 #     (battery_penalty) * \

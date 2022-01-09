@@ -167,6 +167,8 @@ class SupplyChainEnvironment:
         logger.debug("trying to reset signed-in services")
         registry.reset_signed_in_services(context)
 
+        self.episode_reward += self._metrics._upfront_battery_cost
+
         self._miniscot_time_profile["miniscot_action_execution"] = 0
         self._miniscot_time_profile["miniscot_advance_time"] = 0
         self._miniscot_time_profile["miniscot_metrics_time"] = 0
