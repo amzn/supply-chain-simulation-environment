@@ -132,7 +132,6 @@ class NationalGridNetwork(Env):
             battery_loc = (axis_one, axis_two)
             # "Warehouse": batteries
             # note, assumes:
-            # - batteries all in same loc
             # - batteries all have same max inventory (capacity)
             # - batteries all have same initial inventory
             G.add_node(f"Battery{battery_idx}",

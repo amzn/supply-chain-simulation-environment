@@ -14,7 +14,7 @@ class _RunParameters(CoreRunParameters):
 
     # Bespoke parameters
     simulation_logging_level = 'CRITICAL'
-    num_batteries = 5
+    num_batteries = 1  # 5
 
     # for now, assumes all batteries are of same capacity
     # TODO: modify to handle capacity which scales with cost
@@ -25,7 +25,7 @@ class _RunParameters(CoreRunParameters):
         - https://electrek.co/2020/07/06/tesla-deploys-megapack-autobidder/
         - https://electrek.co/2021/07/26/tesla-reveals-megapack-prices/
     '''
-    max_battery_capacity = 1000  # 15  #  units in MWh
+    max_battery_capacity = 50  # 1000  #  units in MWh
     init_battery_capacity = int(max_battery_capacity * 0.2)  # 0.2)
     battery_penalty = 735916.40  # units in £s
 

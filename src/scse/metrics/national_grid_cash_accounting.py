@@ -110,14 +110,19 @@ class CashAccounting():
                 reward = 0
 
         elif actionType == 'transfer':
-            # substations => batteries
+            # substations => batteries and batteries => substation
 
+            # case 1: charge battery_idx
+            if action['origin'] == "Substation" and "Battery" in action["destination"]:
+                transfer_revenue = self._battery_charging * quantity
+            # case 2: discharge/drawdown electricity from battery
             # cost of charging a battery
-            cost = self._battery_charging * quantity
+            if action['destination'] == "Substation" and "Battery" in action["origin"]:
+                transfer_revenue = self._battery_drawdown * quantity
 
-            self._timestep_transfer_cost += cost
+            self._timestep_transfer_cost += transfer_revenue
 
-            reward = cost
+            reward = transfer_revenue  #  positive = good
 
         elif actionType == 'advance_time':
             reward = {}
