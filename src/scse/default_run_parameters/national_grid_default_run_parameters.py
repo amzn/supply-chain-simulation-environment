@@ -17,9 +17,9 @@ class _RunParameters(CoreRunParameters):
     num_batteries = 1  # 5
 
     # Penalty and reward prices, w/ units £/MWh
-    source_request_reward_penalty = -35.63
+    source_request_reward_penalty = -36.65
     sink_deposit_reward_penalty = 27.63
-    battery_drawdown_reward_penalty = 35.63
+    battery_drawdown_reward_penalty = 36.65
     battery_charging_reward_penalty = -27.63
 
     # Other penalties
