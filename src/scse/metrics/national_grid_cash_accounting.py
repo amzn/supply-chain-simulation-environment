@@ -122,7 +122,7 @@ class CashAccounting():
 
             self._timestep_transfer_cost += transfer_revenue
 
-            reward = transfer_revenue # positive = good
+            reward = transfer_revenue  #  positive = good
 
         elif actionType == 'advance_time':
             reward = {}
