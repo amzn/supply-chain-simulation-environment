@@ -7,30 +7,50 @@ import csv
 from scse.constants.national_grid_constants import (
     DEFAULT_BALANCE_SOURCE, DEFAULT_BALANCE_SINK, ELECTRICITY_ASIN
 )
+from scse.default_run_parameters.national_grid_default_run_parameters import (
+    DEFAULT_RUN_PARAMETERS
+)
+
 logger = logging.getLogger(__name__)
 
 
 class CashAccounting():
     def __init__(self, run_parameters):
+
         self._time_horizon = run_parameters['time_horizon']
-        # Hardcoding vendor cost, customer price, holding cost, and lost demand penalty
 
-        # updated for realistic values, w/ units £/MWh
-        self._source_request = -149.8
-        self._sink_deposit = 32.0
+        # Battery CAPEX/OPEX penalties, w/ units £/MWh
+        self._battery_penalty = run_parameters.get(
+            'battery_penalty', DEFAULT_RUN_PARAMETERS.battery_penalty
+        )
+        self._holding_cost = run_parameters.get(
+            'holding_cost', DEFAULT_RUN_PARAMETERS.holding_cost_penalty
+        )  # how much to reward/penalize battery use
+        self._transfer_cost = run_parameters.get(
+            'transfer', DEFAULT_RUN_PARAMETERS.transfer_penalty
+        )  # cost to move from the batteries
 
-        self._battery_charging = -32.0
-        self._battery_drawdown = 149.8
-        # self._cost = 5
-        # self._price = 10
-        self._transfer_cost = 0  # 2 # cost to move from the batteries
+        # Rewards/penalties for using BMRS and batteries
+        self._source_request = run_parameters.get(
+            'source_request', DEFAULT_RUN_PARAMETERS.source_request_reward_penalty
+        )
+        self._sink_deposit = run_parameters.get(
+            'sink_deposit', DEFAULT_RUN_PARAMETERS.sink_deposit_reward_penalty
+        )
+        self._battery_charging = run_parameters.get(
+            'battery_charging', DEFAULT_RUN_PARAMETERS.battery_charging_reward_penalty
+        )
+        self._battery_drawdown = run_parameters.get(
+            'battery_drawdown', DEFAULT_RUN_PARAMETERS.battery_drawdown_reward_penalty
+        )
 
-        self._lost_demand_penalty = 0
+        # Other penalties
+        self._lost_demand_penalty = run_parameters.get(
+            'lost_demand', DEFAULT_RUN_PARAMETERS.lost_demand_penalty
+        )
+        
 
-        # how much to reward/penalize battery use
-        self._holding_cost = 0  # -20
-
-    def reset(self, context, state, battery_penalty=50):
+    def reset(self, context, state):
         self._context = {}
         self._context['asin_list'] = context['asin_list']
 
@@ -45,13 +65,13 @@ class CashAccounting():
         # penalty scaled by capacity of battery
         # TODO: check that this makes sense
         G = state["network"]
-        for node, node_data in G.nodes(data=True):
+        for node, _ in G.nodes(data=True):
             if "Battery" in node:
                 # self._upfront_battery_cost += - \
                 #     (battery_penalty) * \
                 #     node_data["max_inventory"][ELECTRICITY_ASIN]
                 self._upfront_battery_cost += - \
-                    (battery_penalty)
+                    (self._battery_penalty)
 
         # We'll use this to track unfilled demand, since this builds up
         self._cumulative_customer_orders = []

@@ -65,7 +65,8 @@ class SupplyChainEnvironment:
                                            time_horizon=time_horizon,
                                            asin_selection=asin_selection,
                                            num_batteries=num_batteries,
-                                           max_battery_capacity=max_battery_capacity)
+                                           max_battery_capacity=max_battery_capacity,
+                                           battery_penalty = battery_penalty)
                          for class_name in profile_config['metrics']]
 
         # TODO For now, only a single metric module is supported.
@@ -87,8 +88,6 @@ class SupplyChainEnvironment:
         current_program_time = time.time()
         self._miniscot_time_profile['miniscot_init'] = current_program_time - \
             self._program_start_time
-
-        self._battery_penalty = battery_penalty
 
     def get_initial_env_values(self):
         module_start_time = time.time()
@@ -164,7 +163,7 @@ class SupplyChainEnvironment:
                 )+" reset"] = module_end_time - module_start_time
                 self._miniscot_time_profile[module.get_name(
                 )+" compute_actions"] = 0
-        self._metrics.reset(context, state, self._battery_penalty)
+        self._metrics.reset(context, state)
         logger.debug("trying to reset signed-in services")
         registry.reset_signed_in_services(context)
 

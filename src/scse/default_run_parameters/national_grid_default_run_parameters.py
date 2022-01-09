@@ -16,6 +16,17 @@ class _RunParameters(CoreRunParameters):
     simulation_logging_level = 'CRITICAL'
     num_batteries = 1  # 5
 
+    # Penalty and reward prices, w/ units £/MWh
+    source_request_reward_penalty = -36.65
+    sink_deposit_reward_penalty = 27.63
+    battery_drawdown_reward_penalty = 36.65
+    battery_charging_reward_penalty = -27.63
+
+    # Other penalties
+    transfer_penalty = 0  # 2
+    lost_demand_penalty = 0
+    holding_cost_penalty = 0  # -20
+
     # for now, assumes all batteries are of same capacity
     # TODO: modify to handle capacity which scales with cost
 
