@@ -29,3 +29,5 @@ dist
 src/scse/metrics/metrics_log.csv
 
 .python-version
+
+**/.ipynb_checkpoints
