@@ -29,19 +29,10 @@ class _RunParameters(CoreRunParameters):
 
     # for now, assumes all batteries are of same capacity
     # TODO: modify to handle capacity which scales with cost
-
-    '''
-    potential battery types:
-    - tesla's megapack (£735916.40, capacity = 15 MWh)
-        - https://electrek.co/2020/07/06/tesla-deploys-megapack-autobidder/
-        - https://electrek.co/2021/07/26/tesla-reveals-megapack-prices/
-    '''
-    # battery_penalty = 735916.40  # units in £s
-    # max_battery_capacity = 15  # 1000  #  units in MWh
-    # using stat of ~$150/kWh => ~$150,000/MWh
-    battery_penalty = 110387.46  # units in £s
-    max_battery_capacity = 1  # 1000  #  units in MWh
-    init_battery_capacity = int(max_battery_capacity * 0.2)  # 0.2)
+    max_battery_capacity = 50  # 1000  #  units in MWh
+    init_battery_charge_frac = 0.2  # 0.2
+    battery_penalty = 200 * 1000 # units in £/MWh
+    lifetime_years = 10 # number of years over which price is spread
 
 
 DEFAULT_RUN_PARAMETERS = _RunParameters()

@@ -30,8 +30,8 @@ class NationalGridNetwork(Env):
             'transit_time', self._DEFAULT_TRANSIT_TIME)
         self._max_battery_capacity = run_parameters.get(
             'max_battery_capacity', DEFAULT_RUN_PARAMETERS.max_battery_capacity)
-        self._init_battery_capacity = run_parameters.get(
-            'init_battery_capacity', DEFAULT_RUN_PARAMETERS.init_battery_capacity)
+        self._init_battery_charge_frac = run_parameters.get(
+            '_init_battery_charge_frac', DEFAULT_RUN_PARAMETERS.init_battery_charge_frac)
 
         self._num_batteries = run_parameters.get(
             'num_batteries', DEFAULT_RUN_PARAMETERS.num_batteries)
@@ -138,7 +138,10 @@ class NationalGridNetwork(Env):
                        node_type='warehouse',
                        location=battery_loc,
                        inventory={
-                           ELECTRICITY_ASIN: self._init_battery_capacity},
+                           ELECTRICITY_ASIN: int(
+                               self._init_battery_charge_frac * self._max_battery_capacity
+                            )
+                        },
                        max_inventory={
                            ELECTRICITY_ASIN: self._max_battery_capacity}
                        )
