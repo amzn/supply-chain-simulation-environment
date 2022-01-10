@@ -74,8 +74,16 @@ class CashAccounting():
         # penalty scaled by capacity of battery
         # TODO: check that this makes sense
         G = state["network"]
-        self._upfront_battery_cost = self._battery_penalty * self._max_battery_capacity * self._num_batteries
-        self._amortised_battery_cost = self._upfront_battery_cost / (self._lifetime_years * 365 * 24 * 2)
+
+        # Total battery CAPEX, ignoring discounting
+        self._upfront_battery_cost = (
+            self._battery_penalty * self._max_battery_capacity * self._num_batteries
+        )
+        # Amortise battery CAPEX over lifetime
+        # Even installments every simulation period (30 mins)
+        self._amortised_battery_cost = (
+            self._upfront_battery_cost / (self._lifetime_years * 365 * 24 * 2)
+        )
 
         # We'll use this to track unfilled demand, since this builds up
         self._cumulative_customer_orders = []
