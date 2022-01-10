@@ -221,7 +221,7 @@ class CashAccounting():
             reward['total'] -= total_holding_cost
 
             # Per-period payback of amortised battery CAPEX costs
-            # No charge for 0th simulation stage
+            # No penalty for 0th simulation stage
             if state['clock'] != 0:
                 reward['total'] += self._amortised_battery_cost
 
