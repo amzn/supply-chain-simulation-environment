@@ -157,6 +157,8 @@ class CashAccounting():
             reward = transfer_revenue  #  positive = good
 
         elif actionType == 'advance_time':
+            # Make sure to see code + comments at the end of this block
+
             reward = {}
             reward_by_asin = {k: 0 for k in self._context['asin_list']}
             reward['total'] = 0
@@ -165,6 +167,7 @@ class CashAccounting():
             G = state['network']
 
             # accounts for cost w/ keeping energy in the batteries
+            # subtracted from total cost at the end of this block
             for node, node_data in G.nodes(data=True):
                 if node_data['node_type'] == 'warehouse':
                     for asin in G.nodes[node]['inventory']:
@@ -214,8 +217,12 @@ class CashAccounting():
                     writer = csv.writer(f)
                     writer.writerows(self._metrics_log)
 
+            # Subtract cost of inventory at hand from total cost
             reward['total'] -= total_holding_cost
+
+            # Per-period payback of amortised battery CAPEX costs
             reward['total'] += self._amortised_battery_cost
+
             reward['by_asin'] = reward_by_asin
 
         else:
