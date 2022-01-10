@@ -68,7 +68,9 @@ class ElectricitySupply(Agent):
                     raise ValueError('All sources must have only one generation type - multiple not yet supported.')
                 
                 generation_type = generation_types[0]
-                forecasted_supply = self._supply_forecast_service.get_forecast(generation_type, current_time)
+                forecasted_supply = self._supply_forecast_service.get_forecast(
+                    asin=generation_type, clock=current_clock, time=current_time
+                )
                 
                 logger.debug(f"Supply for {forecasted_supply} quantity of ASIN {generation_type}.")
 

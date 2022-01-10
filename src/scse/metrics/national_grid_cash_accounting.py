@@ -72,7 +72,6 @@ class CashAccounting():
 
         # penalize the use of many batteries
         # penalty scaled by capacity of battery
-        # TODO: check that this makes sense
         G = state["network"]
 
         # Total battery CAPEX, ignoring discounting
@@ -147,6 +146,7 @@ class CashAccounting():
             # case 1: charge battery_idx
             if action['origin'] == "Substation" and "Battery" in action["destination"]:
                 transfer_revenue = self._battery_charging * quantity
+
             # case 2: discharge/drawdown electricity from battery
             # cost of charging a battery
             if action['destination'] == "Substation" and "Battery" in action["origin"]:
@@ -221,7 +221,9 @@ class CashAccounting():
             reward['total'] -= total_holding_cost
 
             # Per-period payback of amortised battery CAPEX costs
-            reward['total'] += self._amortised_battery_cost
+            # No charge for 0th simulation stage
+            if state['clock'] != 0:
+                reward['total'] += self._amortised_battery_cost
 
             reward['by_asin'] = reward_by_asin
 

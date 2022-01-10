@@ -55,7 +55,9 @@ class BatteryDrawdown(Agent):
             if node_data.get('node_type') in ['port']:
                 # Would want to pass the node as an argument to the service, in due time
                 future_demand = self._demand_forecast_service.get_forecast(
-                    time=next_time)
+                    clock=current_clock,
+                    time=next_time
+                )
 
                 # Current capacity should be zero most of the time.
                 # Deviations will occur when battery capacity falls to zero.

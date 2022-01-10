@@ -18,9 +18,9 @@ class _RunParameters(CoreRunParameters):
 
     # Penalty and reward prices, w/ units £/MWh
     source_request_reward_penalty = -36.65
-    sink_deposit_reward_penalty = 27.63
+    sink_deposit_reward_penalty = -36.65 # -27.63
     battery_drawdown_reward_penalty = 36.65
-    battery_charging_reward_penalty = -27.63
+    battery_charging_reward_penalty = 36.65 # -27.63
 
     # Other penalties
     transfer_penalty = 0  # 2
@@ -31,7 +31,7 @@ class _RunParameters(CoreRunParameters):
     # TODO: modify to handle capacity which scales with cost
     max_battery_capacity = 50  # 1000  #  units in MWh
     init_battery_charge_frac = 0.2  # 0.2
-    battery_penalty = 200 * 1000 # units in £/MWh
+    battery_penalty = -(200 * 1000) # units in £/MWh
     lifetime_years = 10 # number of years over which price is spread
 
 

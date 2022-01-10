@@ -28,7 +28,7 @@ class ElectricityDemandForecast(Service):
         logger.debug("Resetting electricity demand forecast service.")
         pass
 
-    def get_forecast(self, time):
+    def get_forecast(self, clock, time):
         """
         Generate a demand forcast for the given time.
 
@@ -39,6 +39,11 @@ class ElectricityDemandForecast(Service):
         i.e. the same forecast is returned when the same arguments
         are passed.
         """
+
+        # No demand for the 0th simulation period
+        # There is no supply in the -1th period
+        if clock == 0:
+            return 0
 
         # Determine which period of the day is being considered
         # Date information is not yet being used
