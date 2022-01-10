@@ -41,8 +41,11 @@ class ElectricityDemand(Agent):
         """
         actions = []
         current_time = state['date_time']
+        current_clock = state['clock']
 
-        forecasted_demand = self._demand_forecast_service.get_forecast(current_time)
+        forecasted_demand = self._demand_forecast_service.get_forecast(
+            clock=current_clock, time=current_time
+        )
 
         action = {
             'type': 'customer_order',

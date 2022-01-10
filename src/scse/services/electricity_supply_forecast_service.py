@@ -33,7 +33,7 @@ class ElectricitySupplyForecast(Service):
         if self._asin_list != context['asin_list']:
             self._asin_list = context['asin_list']
             
-    def get_forecast(self, asin, time):
+    def get_forecast(self, asin, clock, time):
         """
         Generate a supply forcast for the given ASIN/electricity generation
         type, and the given time.

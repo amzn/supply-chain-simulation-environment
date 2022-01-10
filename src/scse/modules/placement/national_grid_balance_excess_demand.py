@@ -55,7 +55,10 @@ class BalanceExcessDemand(Agent):
         for node, node_data in G.nodes(data=True):
             if node_data.get('node_type') in ['port']:
                 # Would want to pass the node as an argument to the service, in due time
-                future_demand = self._demand_forecast_service.get_forecast(time=next_time)
+                future_demand = self._demand_forecast_service.get_forecast(
+                    clock=current_clock,
+                    time=next_time
+                )
 
                 # Current capacity should be zero most of the time, as long as the balance
                 # mechanism source is in use.
