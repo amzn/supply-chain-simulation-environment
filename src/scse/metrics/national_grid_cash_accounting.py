@@ -23,6 +23,15 @@ class CashAccounting():
         self._battery_penalty = run_parameters.get(
             'battery_penalty', DEFAULT_RUN_PARAMETERS.battery_penalty
         )
+        self._num_batteries = run_parameters.get(
+            'num_batteries', DEFAULT_RUN_PARAMETERS.num_batteries
+        )
+        self._max_battery_capacity = run_parameters.get(
+            'max_battery_capacity', DEFAULT_RUN_PARAMETERS.max_battery_capacity
+        )
+        self._lifetime_years = run_parameters.get(
+            'lifetime_years', DEFAULT_RUN_PARAMETERS.lifetime_years
+        )
         self._holding_cost = run_parameters.get(
             'holding_cost', DEFAULT_RUN_PARAMETERS.holding_cost_penalty
         )  # how much to reward/penalize battery use
@@ -65,13 +74,8 @@ class CashAccounting():
         # penalty scaled by capacity of battery
         # TODO: check that this makes sense
         G = state["network"]
-        for node, _ in G.nodes(data=True):
-            if "Battery" in node:
-                # self._upfront_battery_cost += - \
-                #     (battery_penalty) * \
-                #     node_data["max_inventory"][ELECTRICITY_ASIN]
-                self._upfront_battery_cost += - \
-                    (self._battery_penalty)
+        self._upfront_battery_cost = self._battery_penalty * self._max_battery_capacity * self._num_batteries
+        self._amortised_battery_cost = self._upfront_battery_cost / (self._lifetime_years * 365 * 24 * 2)
 
         # We'll use this to track unfilled demand, since this builds up
         self._cumulative_customer_orders = []
@@ -203,6 +207,7 @@ class CashAccounting():
                     writer.writerows(self._metrics_log)
 
             reward['total'] -= total_holding_cost
+            reward['total'] += self._amortised_battery_cost
             reward['by_asin'] = reward_by_asin
 
         else:
