@@ -26,6 +26,7 @@ dist
 *.lp
 *.log
 *.csv
+*.png
 src/scse/metrics/metrics_log.csv
 
 .python-version
