@@ -7,15 +7,16 @@ def plot_3d_boundary(X, Y, mesh_X, mesh_Y,
                      mu_plot, var_plot,
                      elev,
                      angle,
-                     z_lims,
+                     z_lims=None,
                      plot_new=False,
                      new_X=None,
                      new_Y=None,
+                     dpi=100,
                      plot_ci=True,
                      title=None,
                      save_fig_path=None):
 
-    fig = plt.figure(figsize=(10, 10), dpi=100)
+    fig = plt.figure(figsize=(10, 10), dpi=dpi)
     ax = fig.gca(projection='3d')
     surf = ax.plot_surface(mesh_X, mesh_Y, mu_plot.reshape(
         (1000, 21)), cmap='viridis', linewidth=0, antialiased=False, alpha=0.60)
@@ -46,9 +47,9 @@ def plot_3d_boundary(X, Y, mesh_X, mesh_Y,
     plt.legend(loc='upper right', prop={'size': 15})
 
     if save_fig_path:
-        # for angle in range(0, 360, 40):
-        #     ax.view_init(elev=10., azim=angle)
-        plt.savefig(save_fig_path)
+        for theta in range(0, 360, 10):
+            ax.view_init(elev=elev, azim=theta)
+            plt.savefig(save_fig_path+"_{}.png".format(theta))
 
     ax.view_init(elev=elev, azim=angle)
     return fig, ax
@@ -57,13 +58,14 @@ def plot_3d_boundary(X, Y, mesh_X, mesh_Y,
 def plot_3d_observed_rewards(X, Y,
                              elev,
                              angle,
-                             z_lims,
+                             z_lims=None,
                              new_X=None,
                              new_Y=None,
                              title=None,
+                             dpi=100,
                              save_fig_path=None):
 
-    fig = plt.figure(figsize=(10, 10), dpi=100)
+    fig = plt.figure(figsize=(10, 10), dpi=dpi)
     ax = plt.axes(projection='3d')
 
     im = ax.plot_trisurf(new_X[:, 0].flatten(), new_X[:, 1].flatten(
@@ -90,11 +92,14 @@ def plot_3d_observed_rewards(X, Y,
         ax.set_zlim(z_lims)
 
     ax.grid(True)
-    plt.title("Contour of observed rewards")
+    if title == None:
+        plt.title("Contour of observed rewards")
+    else:
+        plt.title(title)
 
     if save_fig_path:
-        # for angle in range(0, 360, 40):
-        #     ax.view_init(elev=10., azim=angle)
-        plt.savefig(save_fig_path)
+        for theta in range(0, 360, 10):
+            ax.view_init(elev=elev, azim=theta)
+            plt.savefig(save_fig_path+"_{}.png".format(theta))
 
     return fig, ax
