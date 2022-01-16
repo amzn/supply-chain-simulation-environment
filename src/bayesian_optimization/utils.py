@@ -59,6 +59,7 @@ def plot_3d_observed_rewards(X, Y,
                              elev,
                              angle,
                              z_lims=None,
+                             plot_new=None,
                              new_X=None,
                              new_Y=None,
                              title=None,
@@ -68,18 +69,23 @@ def plot_3d_observed_rewards(X, Y,
     fig = plt.figure(figsize=(10, 10), dpi=dpi)
     ax = plt.axes(projection='3d')
 
-    im = ax.plot_trisurf(new_X[:, 0].flatten(), new_X[:, 1].flatten(
-    ), new_Y.flatten(), cmap='viridis', alpha=0.70)
-
     ax.scatter(X[:, 0].flatten(), X[:, 1].flatten(), Y.flatten(),
                s=100, marker="o", color="b", label="Initial observations")
-    ax.scatter(new_X[:, 0].flatten(), new_X[:, 1].flatten(),
-               new_Y.flatten(), marker="x", color="r", label="All observations", s=100)
 
-    min_X = new_X[np.argmin(new_Y)]
-    min_Y = np.min(new_Y)
-    ax.scatter(min_X[0], min_X[1], min_Y, c='black',
-               marker='D', label="Minimum", s=200)
+    if plot_new:
+        im = ax.plot_trisurf(new_X[:, 0].flatten(), new_X[:, 1].flatten(
+        ), new_Y.flatten(), cmap='viridis', alpha=0.70)
+
+        ax.scatter(new_X[:, 0].flatten(), new_X[:, 1].flatten(),
+                   new_Y.flatten(), marker="x", color="r", label="All observations", s=100)
+
+        min_X = new_X[np.argmin(new_Y)]
+        min_Y = np.min(new_Y)
+        ax.scatter(min_X[0], min_X[1], min_Y, c='black',
+                   marker='D', label="Minimum", s=200)
+    else:
+        im = ax.plot_trisurf(X[:, 0].flatten(), X[:, 1].flatten(
+        ), Y.flatten(), cmap='viridis', alpha=0.70)
 
     ax.legend(loc=1, prop={'size': 15})
     ax.set_xlabel("Num batteries")
