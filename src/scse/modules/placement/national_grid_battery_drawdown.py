@@ -116,18 +116,15 @@ class BatteryDrawdown(Agent):
         # - Substations with the greatest predicted deficit are serviced first
         # - Electricity is drawn down from the closest batteries first
         for substation in list(substations.keys()):
-            # Starting deficit figure
-            future_deficit = substations[substation]
-
             for battery in list(batteries.keys()):
                 # Initial available capacity
                 battery_capacity = batteries[battery]
 
                 # If capacity exceeds the substation's forcasted deficit then fully meet that deficit
                 # Otherwise, drain the battery and remove it from the list
-                if battery_capacity >= future_deficit:
-                    drawdown_amount = future_deficit
-                    batteries[battery] -= future_deficit
+                if battery_capacity >= substations[substation]:
+                    drawdown_amount = substations[substation]
+                    batteries[battery] -= substations[substation]
                 else:
                     drawdown_amount = battery_capacity
                     del batteries[battery]
@@ -151,7 +148,7 @@ class BatteryDrawdown(Agent):
                 actions.append(action)
 
                 # If the substation's deficit has now bene met then break
-                if future_deficit == 0:
+                if substations[substation] == 0:
                     del substations[substation]
                     logger.debug(
                         f"Met supply deficit at substation {substation} in next timestep.")
